@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">SafeSwitch logo</title>
+  <desc id="desc">Overlapping dark squares with an upward-right arrow shape.</desc>
+  <defs>
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1220" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="60" height="60" rx="14" fill="url(#bgGradient)" opacity="0.96" />
+  <rect x="22" y="22" width="60" height="60" rx="14" fill="#111827" opacity="0.9" />
+  <path d="M28 60 L28 44 L44 44 L44 28 L68 28 L68 52 L52 52 L52 68 Z" fill="url(#accentGradient)" />
+  <path d="M46 26 L70 26 L70 50" stroke="#22d3ee" stroke-width="6" stroke-linecap="round" />
+  <path d="M70 26 L70 50 L46 50" fill="none" stroke="#22d3ee" stroke-width="6" stroke-linecap="round" />
+</svg>
