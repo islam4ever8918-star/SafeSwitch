@@ -1,0 +1,3774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Security — SafeSwitch Systems</title>
+
+  <meta
+    name="description"
+    content="SafeSwitch security architecture — kernel-level enforcement, eBPF, XDP, secure releases, cryptographic state and resilient infrastructure."
+  />
+
+  <style>
+    /* =========================================================
+       RESET
+    ========================================================= */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      background: #000;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+
+      font-family:
+        Inter,
+        Geist,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    ::selection {
+      color: #000;
+      background: #00e5ff;
+    }
+
+
+    /* =========================================================
+       GLOBAL BACKGROUND
+    ========================================================= */
+
+    .background {
+      position: fixed;
+      inset: 0;
+
+      pointer-events: none;
+
+      z-index: 0;
+
+      overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle at 50% 0%,
+          rgba(0, 229, 255, .055),
+          transparent 32%
+        ),
+        radial-gradient(
+          circle at 90% 60%,
+          rgba(119, 70, 255, .035),
+          transparent 30%
+        ),
+        #000;
+    }
+
+    .grid {
+      position: absolute;
+      inset: 0;
+
+      opacity: .17;
+
+      background-image:
+        linear-gradient(
+          rgba(255,255,255,.025) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,.025) 1px,
+          transparent 1px
+        );
+
+      background-size: 72px 72px;
+
+      mask-image:
+        linear-gradient(
+          to bottom,
+          black 0%,
+          black 65%,
+          transparent 100%
+        );
+    }
+
+    .ambient {
+      position: absolute;
+
+      width: 700px;
+      height: 700px;
+
+      border-radius: 50%;
+
+      filter: blur(100px);
+
+      opacity: .08;
+
+      animation:
+        ambientMove
+        16s
+        ease-in-out
+        infinite alternate;
+    }
+
+    .ambient.one {
+      top: -350px;
+      left: -200px;
+
+      background: #00e5ff;
+    }
+
+    .ambient.two {
+      right: -350px;
+      top: 35%;
+
+      background: #7047ff;
+
+      animation-delay: -7s;
+    }
+
+    @keyframes ambientMove {
+      from {
+        transform: translate3d(-20px, -10px, 0);
+      }
+
+      to {
+        transform: translate3d(80px, 70px, 0);
+      }
+    }
+
+
+    /* =========================================================
+       CURSOR
+    ========================================================= */
+
+    .cursor {
+      position: fixed;
+
+      width: 400px;
+      height: 400px;
+
+      transform: translate(-50%, -50%);
+
+      pointer-events: none;
+
+      z-index: 1;
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(0,229,255,.055),
+          transparent 68%
+        );
+
+      filter: blur(12px);
+    }
+
+
+    /* =========================================================
+       NAVIGATION
+    ========================================================= */
+
+    nav {
+      position: relative;
+
+      z-index: 20;
+
+      width: min(1280px, calc(100% - 48px));
+
+      height: 88px;
+
+      margin: 0 auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      border-bottom:
+        1px solid rgba(255,255,255,.07);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+
+      color: #fff;
+      text-decoration: none;
+
+      font-size: 14px;
+      font-weight: 650;
+
+      letter-spacing: -.03em;
+    }
+
+    .brand-mark {
+      width: 8px;
+      height: 8px;
+
+      border-radius: 50%;
+
+      background: #00e5ff;
+
+      box-shadow:
+        0 0 10px #00e5ff,
+        0 0 30px rgba(0,229,255,.45);
+
+      animation:
+        breathe
+        2.2s
+        ease-in-out
+        infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.4);
+      }
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      color: rgba(255,255,255,.25);
+
+      font-size: 9px;
+      font-weight: 600;
+
+      letter-spacing: .18em;
+    }
+
+    .live-dot {
+      width: 5px;
+      height: 5px;
+
+      border-radius: 50%;
+
+      background: #62ffb0;
+
+      box-shadow:
+        0 0 10px rgba(98,255,176,.7);
+    }
+
+
+    /* =========================================================
+       MAIN
+    ========================================================= */
+
+    main {
+      position: relative;
+      z-index: 2;
+    }
+
+
+    /* =========================================================
+       HERO
+    ========================================================= */
+
+    .hero {
+      position: relative;
+
+      min-height: 100vh;
+
+      width: min(1280px, calc(100% - 48px));
+
+      margin: auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      text-align: center;
+
+      padding: 120px 0 170px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 5;
+
+      max-width: 1100px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+
+      margin-bottom: 30px;
+
+      color: rgba(255,255,255,.35);
+
+      font-size: 10px;
+      font-weight: 650;
+
+      letter-spacing: .25em;
+    }
+
+    .eyebrow::before {
+      content: "";
+
+      width: 5px;
+      height: 5px;
+
+      border-radius: 50%;
+
+      background: #00e5ff;
+
+      box-shadow:
+        0 0 10px #00e5ff,
+        0 0 25px rgba(0,229,255,.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(
+        65px,
+        10vw,
+        140px
+      );
+
+      line-height: .84;
+
+      letter-spacing: -.09em;
+
+      font-weight: 600;
+    }
+
+    .hero h1 .dim {
+      display: block;
+
+      color: rgba(255,255,255,.22);
+    }
+
+    .hero-description {
+      max-width: 670px;
+
+      margin: 38px auto 0;
+
+      color: rgba(255,255,255,.39);
+
+      font-size: 15px;
+
+      line-height: 1.8;
+    }
+
+    .hero-status {
+      margin-top: 45px;
+
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+
+      padding: 11px 15px;
+
+      border:
+        1px solid rgba(0,229,255,.13);
+
+      background:
+        rgba(0,229,255,.025);
+
+      color: rgba(255,255,255,.34);
+
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+      font-size: 9px;
+
+      letter-spacing: .12em;
+    }
+
+    .hero-status strong {
+      color: #62ffb0;
+
+      font-weight: 500;
+    }
+
+
+    /* =========================================================
+       HERO CORE
+    ========================================================= */
+
+    .hero-core {
+      position: absolute;
+
+      left: 50%;
+      bottom: 40px;
+
+      width: 420px;
+      height: 130px;
+
+      transform:
+        translateX(-50%);
+
+      pointer-events: none;
+
+      opacity: .55;
+    }
+
+    .core-line {
+      position: absolute;
+
+      left: 50%;
+
+      width: 1px;
+      height: 100%;
+
+      background:
+        linear-gradient(
+          transparent,
+          rgba(0,229,255,.5),
+          transparent
+        );
+    }
+
+    .core-ring {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 120px;
+      height: 120px;
+
+      transform:
+        translate(-50%, -50%);
+
+      border:
+        1px solid rgba(0,229,255,.16);
+
+      border-radius: 50%;
+
+      animation:
+        ringPulse
+        4s
+        ease-in-out
+        infinite;
+    }
+
+    .core-ring::before,
+    .core-ring::after {
+      content: "";
+
+      position: absolute;
+
+      inset: 15px;
+
+      border:
+        1px dashed rgba(0,229,255,.18);
+
+      border-radius: 50%;
+    }
+
+    .core-ring::after {
+      inset: 32px;
+
+      border-style: solid;
+
+      border-color:
+        rgba(138,92,255,.25);
+
+      animation:
+        spin
+        8s
+        linear
+        infinite;
+    }
+
+    @keyframes ringPulse {
+      0%, 100% {
+        transform:
+          translate(-50%, -50%)
+          scale(.95);
+      }
+
+      50% {
+        transform:
+          translate(-50%, -50%)
+          scale(1.08);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+
+    /* =========================================================
+       SECTION COMMON
+    ========================================================= */
+
+    .section {
+      position: relative;
+
+      width: min(1280px, calc(100% - 48px));
+
+      margin: 0 auto;
+
+      padding: 150px 0;
+    }
+
+    .section-header {
+      max-width: 750px;
+
+      margin-bottom: 75px;
+    }
+
+    .section-index {
+      margin-bottom: 18px;
+
+      color: #00e5ff;
+
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+      font-size: 9px;
+
+      letter-spacing: .18em;
+    }
+
+    .section h2 {
+      font-size: clamp(
+        45px,
+        6vw,
+        80px
+      );
+
+      line-height: .9;
+
+      letter-spacing: -.075em;
+
+      font-weight: 600;
+    }
+
+    .section h2 span {
+      color: rgba(255,255,255,.22);
+    }
+
+    .section-description {
+      max-width: 620px;
+
+      margin-top: 25px;
+
+      color: rgba(255,255,255,.37);
+
+      font-size: 14px;
+
+      line-height: 1.8;
+    }
+
+
+    /* =========================================================
+       SECURITY MODEL CARDS
+    ========================================================= */
+
+    .model-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 1px;
+
+      background:
+        rgba(255,255,255,.08);
+
+      border:
+        1px solid rgba(255,255,255,.08);
+    }
+
+    .model-card {
+      position: relative;
+
+      min-height: 270px;
+
+      padding: 30px;
+
+      background: #030303;
+
+      overflow: hidden;
+
+      transition:
+        background .4s ease,
+        transform .5s cubic-bezier(.16,1,.3,1);
+    }
+
+    .model-card:hover {
+      background:
+        rgba(0,229,255,.025);
+
+      transform:
+        translateY(-5px);
+    }
+
+    .model-card::after {
+      content: "";
+
+      position: absolute;
+
+      left: 0;
+      bottom: 0;
+
+      width: 0;
+      height: 1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          #00e5ff,
+          #875cff,
+          transparent
+        );
+
+      transition:
+        width .6s ease;
+    }
+
+    .model-card:hover::after {
+      width: 100%;
+    }
+
+    .card-number {
+      color: rgba(255,255,255,.17);
+
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+      font-size: 10px;
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+
+      margin: 40px 0 28px;
+
+      border:
+        1px solid rgba(0,229,255,.18);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      color: #00e5ff;
+
+      font-family:
+        monospace;
+
+      font-size: 13px;
+
+      background:
+        rgba(0,229,255,.025);
+    }
+
+    .model-card h3 {
+      margin-bottom: 10px;
+
+      font-size: 16px;
+
+      letter-spacing: -.035em;
+    }
+
+    .model-card p {
+      color: rgba(255,255,255,.31);
+
+      font-size: 12px;
+
+      line-height: 1.7;
+    }
+
+
+    /* =========================================================
+       DESCENT / LAYER VISUAL
+    ========================================================= */
+
+    .descent {
+      min-height: 100vh;
+
+      display: grid;
+
+      grid-template-columns:
+        .8fr
+        1.2fr;
+
+      gap: 100px;
+
+      align-items: center;
+    }
+
+    .descent-copy {
+      position: sticky;
+
+      top: 160px;
+
+      align-self: start;
+    }
+
+    .descent-copy h2 {
+      font-size: clamp(
+        50px,
+        6vw,
+        85px
+      );
+
+      line-height: .88;
+
+      letter-spacing: -.08em;
+    }
+
+    .descent-copy h2 span {
+      color: rgba(255,255,255,.22);
+    }
+
+    .descent-copy p {
+      max-width: 450px;
+
+      margin-top: 30px;
+
+      color: rgba(255,255,255,.35);
+
+      font-size: 13px;
+
+      line-height: 1.8;
+    }
+
+    .layer-stack {
+      position: relative;
+
+      min-height: 850px;
+
+      padding: 30px 0;
+    }
+
+    .layer {
+      position: sticky;
+
+      top: 180px;
+
+      height: 135px;
+
+      margin-bottom: 18px;
+
+      padding: 24px 28px;
+
+      border:
+        1px solid rgba(255,255,255,.09);
+
+      background:
+        linear-gradient(
+          110deg,
+          rgba(255,255,255,.035),
+          rgba(255,255,255,.008)
+        );
+
+      backdrop-filter:
+        blur(20px);
+
+      transition:
+        border-color .4s ease,
+        transform .5s cubic-bezier(.16,1,.3,1),
+        box-shadow .4s ease;
+    }
+
+    .layer:hover {
+      transform:
+        translateX(-8px);
+
+      border-color:
+        rgba(0,229,255,.28);
+
+      box-shadow:
+        -20px 0 50px rgba(0,229,255,.04);
+    }
+
+    .layer:nth-child(1) {
+      top: 150px;
+    }
+
+    .layer:nth-child(2) {
+      top: 205px;
+    }
+
+    .layer:nth-child(3) {
+      top: 260px;
+    }
+
+    .layer:nth-child(4) {
+      top: 315px;
+    }
+
+    .layer:nth-child(5) {
+      top: 370px;
+    }
+
+    .layer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 16px;
+    }
+
+    .layer-name {
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+      font-size: 11px;
+
+      color: rgba(255,255,255,.72);
+    }
+
+    .layer-tag {
+      color: rgba(255,255,255,.22);
+
+      font-size: 8px;
+
+      letter-spacing: .14em;
+    }
+
+    .layer p {
+      max-width: 550px;
+
+      color: rgba(255,255,255,.28);
+
+      font-size: 11px;
+
+      line-height: 1.6;
+    }
+
+    .layer.active {
+      border-color:
+        rgba(0,229,255,.3);
+
+      box-shadow:
+        0 0 50px rgba(0,229,255,.045);
+    }
+
+
+    /* =========================================================
+       PACKET SIMULATION
+    ========================================================= */
+
+    .packet-section {
+      min-height: 100vh;
+
+      display: flex;
+      align-items: center;
+    }
+
+    .packet-interface {
+      position: relative;
+
+      width: 100%;
+
+      height: 600px;
+
+      border:
+        1px solid rgba(255,255,255,.08);
+
+      background:
+        radial-gradient(
+          circle at 50% 50%,
+          rgba(0,229,255,.035),
+          transparent 40%
+        ),
+        #020202;
+
+      overflow: hidden;
+    }
+
+    .packet-interface::before {
+      content: "";
+
+      position: absolute;
+      inset: 0;
+
+      background-image:
+        linear-gradient(
+          rgba(255,255,255,.018) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,.018) 1px,
+          transparent 1px
+        );
+
+      background-size: 50px 50px;
+    }
+
+    .packet-title {
+      position: absolute;
+
+      top: 28px;
+      left: 30px;
+
+      z-index: 5;
+
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+      font-size: 9px;
+
+      letter-spacing: .16em;
+
+      color: rgba(255,255,255,.27);
+    }
+
+    .network-node {
+      position: absolute;
+
+      top: 50%;
+
+      width: 105px;
+      height: 105px;
+
+      transform: translateY(-50%);
+
+      border:
+        1px solid rgba(255,255,255,.12);
+
+      background:
+        rgba(255,255,255,.018);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      text-align: center;
+
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+      font-size: 9px;
+
+      letter-spacing: .08em;
+    }
+
+    .network-node small {
+      display: block;
+
+      margin-top: 7px;
+
+      color: rgba(255,255,255,.25);
+
+      font-size: 7px;
+    }
+
+    .node-internet {
+      left: 8%;
+    }
+
+    .node-nic {
+      left: 32%;
+
+      border-color:
+        rgba(0,229,255,.28);
+
+      box-shadow:
+        0 0 40px rgba(0,229,255,.05);
+    }
+
+    .node-xdp {
+      left: 50%;
+
+      transform:
+        translate(-50%, -50%);
+
+      width: 135px;
+      height: 135px;
+
+      border-radius: 50%;
+
+      border-color:
+        rgba(0,229,255,.4);
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(0,229,255,.08),
+          rgba(0,0,0,.8)
+        );
+
+      box-shadow:
+        0 0 80px rgba(0,229,255,.08);
+    }
+
+    .node-kernel {
+      right: 25%;
+    }
+
+    .node-app {
+      right: 8%;
+    }
+
+    .connection {
+      position: absolute;
+
+      left: 13%;
+
+      right: 13%;
+
+      top: 50%;
+
+      height: 1px;
+
+      transform: translateY(-50%);
+
+      background:
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,.06),
+          rgba(0,229,255,.2),
+          rgba(255,255,255,.06)
+        );
+    }
+
+    .packet {
+      position: absolute;
+
+      width: 32px;
+      height: 2px;
+
+      top: calc(50% - 1px);
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          #00e5ff
+        );
+
+      box-shadow:
+        0 0 10px #00e5ff;
+
+      animation:
+        packetMove
+        3s
+        linear
+        infinite;
+
+      z-index: 4;
+    }
+
+    .packet.red {
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          #ff315a
+        );
+
+      box-shadow:
+        0 0 12px #ff315a;
+
+      animation-duration: 1.7s;
+
+      opacity: .7;
+    }
+
+    @keyframes packetMove {
+      from {
+        left: 7%;
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      90% {
+        opacity: 1;
+      }
+
+      to {
+        left: 93%;
+        opacity: 0;
+      }
+    }
+
+    .drop-zone {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 150px;
+      height: 150px;
+
+      transform:
+        translate(-50%, -50%);
+
+      border-radius: 50%;
+
+      pointer-events: none;
+
+      animation:
+        dropPulse
+        2.5s
+        ease-in-out
+        infinite;
+    }
+
+    @keyframes dropPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 0 0 rgba(255,49,90,0);
+      }
+
+      50% {
+        box-shadow:
+          0 0 0 25px rgba(255,49,90,.015);
+      }
+    }
+
+
+    /* =========================================================
+       METRICS
+    ========================================================= */
+
+    .metrics {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      border-top:
+        1px solid rgba(255,255,255,.08);
+
+      border-left:
+        1px solid rgba(255,255,255,.08);
+    }
+
+    .metric {
+      padding: 30px;
+
+      border-right:
+        1px solid rgba(255,255,255,.08);
+
+      border-bottom:
+        1px solid rgba(255,255,255,.08);
+    }
+
+    .metric-value {
+      display: block;
+
+      font-size: 35px;
+
+      letter-spacing: -.07em;
+
+      font-weight: 550;
+
+      margin-bottom: 8px;
+    }
+
+    .metric-value.cyan {
+      color: #00e5ff;
+    }
+
+    .metric-value.green {
+      color: #62ffb0;
+    }
+
+    .metric-value.purple {
+      color: #9b7aff;
+    }
+
+    .metric-label {
+      color: rgba(255,255,255,.25);
+
+      font-size: 8px;
+
+      letter-spacing: .16em;
+    }
+
+
+    /* =========================================================
+       SECURITY PRACTICES
+    ========================================================= */
+
+    .practice-grid {
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 1px;
+
+      background:
+        rgba(255,255,255,.07);
+
+      border:
+        1px solid rgba(255,255,255,.07);
+    }
+
+    .practice {
+      position: relative;
+
+      min-height: 280px;
+
+      padding: 38px;
+
+      background: #020202;
+
+      overflow: hidden;
+    }
+
+    .practice::before {
+      content: "";
+
+      position: absolute;
+
+      top: 0;
+      left: 0;
+
+      width: 100%;
+      height: 1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(0,229,255,.35),
+          transparent
+        );
+
+      transform:
+        translateX(-100%);
+
+      transition:
+        transform .7s ease;
+    }
+
+    .practice:hover::before {
+      transform:
+        translateX(100%);
+    }
+
+    .practice-number {
+      color: rgba(255,255,255,.17);
+
+      font-family:
+        monospace;
+
+      font-size: 9px;
+    }
+
+    .practice h3 {
+      margin-top: 60px;
+
+      margin-bottom: 14px;
+
+      font-size: 19px;
+
+      letter-spacing: -.045em;
+    }
+
+    .practice p {
+      max-width: 460px;
+
+      color: rgba(255,255,255,.32);
+
+      font-size: 12px;
+
+      line-height: 1.8;
+    }
+
+
+    /* =========================================================
+       SECURE RELEASE PIPELINE
+    ========================================================= */
+
+    .pipeline {
+      position: relative;
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(6, 1fr);
+
+      gap: 0;
+
+      margin-top: 70px;
+    }
+
+    .pipeline::before {
+      content: "";
+
+      position: absolute;
+
+      top: 33px;
+      left: 8%;
+      right: 8%;
+
+      height: 1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          rgba(0,229,255,.05),
+          rgba(0,229,255,.4),
+          rgba(138,92,255,.4),
+          rgba(0,229,255,.05)
+        );
+    }
+
+    .pipeline-step {
+      position: relative;
+
+      text-align: center;
+    }
+
+    .pipeline-node {
+      position: relative;
+
+      width: 66px;
+      height: 66px;
+
+      margin: 0 auto 25px;
+
+      border:
+        1px solid rgba(255,255,255,.12);
+
+      background: #020202;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-family:
+        monospace;
+
+      font-size: 9px;
+
+      z-index: 2;
+
+      transition:
+        border-color .3s ease,
+        box-shadow .3s ease,
+        transform .3s ease;
+    }
+
+    .pipeline-step:hover .pipeline-node {
+      transform: scale(1.08);
+
+      border-color:
+        rgba(0,229,255,.45);
+
+      box-shadow:
+        0 0 30px rgba(0,229,255,.08);
+    }
+
+    .pipeline-step h4 {
+      margin-bottom: 7px;
+
+      font-size: 11px;
+    }
+
+    .pipeline-step p {
+      padding: 0 10px;
+
+      color: rgba(255,255,255,.23);
+
+      font-size: 9px;
+
+      line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       CRYPTOGRAPHY
+    ========================================================= */
+
+    .crypto {
+      display: grid;
+
+      grid-template-columns:
+        1fr
+        1fr;
+
+      gap: 100px;
+
+      align-items: center;
+    }
+
+    .crypto-visual {
+      position: relative;
+
+      height: 570px;
+
+      border:
+        1px solid rgba(255,255,255,.08);
+
+      background:
+        radial-gradient(
+          circle at center,
+          rgba(138,92,255,.07),
+          transparent 42%
+        ),
+        #020202;
+
+      overflow: hidden;
+    }
+
+    .lattice {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 330px;
+      height: 330px;
+
+      transform:
+        translate(-50%, -50%)
+        rotateX(60deg)
+        rotateZ(25deg);
+
+      animation:
+        latticeSpin
+        16s
+        linear
+        infinite;
+    }
+
+    .lattice-line {
+      position: absolute;
+
+      background:
+        rgba(138,92,255,.25);
+    }
+
+    .lattice-line.horizontal {
+      left: 0;
+      right: 0;
+
+      height: 1px;
+    }
+
+    .lattice-line.vertical {
+      top: 0;
+      bottom: 0;
+
+      width: 1px;
+    }
+
+    @for-placeholder {}
+
+    .crypto-core {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 95px;
+      height: 95px;
+
+      transform:
+        translate(-50%, -50%);
+
+      border:
+        1px solid rgba(138,92,255,.5);
+
+      background:
+        rgba(138,92,255,.07);
+
+      box-shadow:
+        0 0 80px rgba(138,92,255,.12);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-family:
+        monospace;
+
+      font-size: 10px;
+
+      color: #b19cff;
+    }
+
+    @keyframes latticeSpin {
+      from {
+        transform:
+          translate(-50%, -50%)
+          rotateX(60deg)
+          rotateZ(0deg);
+      }
+
+      to {
+        transform:
+          translate(-50%, -50%)
+          rotateX(60deg)
+          rotateZ(360deg);
+      }
+    }
+
+    .crypto-copy h2 {
+      font-size: clamp(
+        48px,
+        5vw,
+        76px
+      );
+
+      line-height: .88;
+
+      letter-spacing: -.075em;
+    }
+
+    .crypto-copy h2 span {
+      color: rgba(255,255,255,.2);
+    }
+
+    .crypto-copy p {
+      margin-top: 30px;
+
+      color: rgba(255,255,255,.35);
+
+      font-size: 13px;
+
+      line-height: 1.8;
+    }
+
+    .crypto-badge {
+      display: inline-block;
+
+      margin-top: 35px;
+
+      padding: 10px 13px;
+
+      border:
+        1px solid rgba(138,92,255,.22);
+
+      color: #a991ff;
+
+      background:
+        rgba(138,92,255,.035);
+
+      font-family:
+        monospace;
+
+      font-size: 9px;
+
+      letter-spacing: .1em;
+    }
+
+
+    /* =========================================================
+       SUPPLY CHAIN
+    ========================================================= */
+
+    .supply {
+      position: relative;
+
+      min-height: 550px;
+
+      padding: 60px;
+
+      border:
+        1px solid rgba(255,255,255,.08);
+
+      overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle at 50% 100%,
+          rgba(0,229,255,.045),
+          transparent 45%
+        ),
+        #020202;
+    }
+
+    .supply::after {
+      content: "";
+
+      position: absolute;
+
+      width: 1px;
+
+      height: 100%;
+
+      left: 50%;
+      top: 0;
+
+      background:
+        linear-gradient(
+          transparent,
+          rgba(0,229,255,.25),
+          transparent
+        );
+    }
+
+    .supply-title {
+      text-align: center;
+
+      position: relative;
+
+      z-index: 2;
+    }
+
+    .supply-title h2 {
+      font-size: clamp(
+        45px,
+        6vw,
+        78px
+      );
+
+      line-height: .88;
+
+      letter-spacing: -.075em;
+    }
+
+    .supply-title p {
+      max-width: 500px;
+
+      margin: 25px auto;
+
+      color: rgba(255,255,255,.3);
+
+      font-size: 12px;
+
+      line-height: 1.7;
+    }
+
+    .supply-flow {
+      position: relative;
+
+      z-index: 2;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      gap: 0;
+
+      margin-top: 75px;
+    }
+
+    .supply-box {
+      width: 145px;
+      height: 100px;
+
+      border:
+        1px solid rgba(255,255,255,.1);
+
+      background:
+        rgba(255,255,255,.02);
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      text-align: center;
+
+      transition:
+        border-color .3s ease,
+        background .3s ease;
+    }
+
+    .supply-box:hover {
+      border-color:
+        rgba(0,229,255,.35);
+
+      background:
+        rgba(0,229,255,.035);
+    }
+
+    .supply-box strong {
+      font-size: 11px;
+    }
+
+    .supply-box span {
+      margin-top: 8px;
+
+      color: rgba(255,255,255,.25);
+
+      font-size: 8px;
+
+      letter-spacing: .08em;
+    }
+
+    .flow-arrow {
+      width: 55px;
+
+      color: rgba(0,229,255,.4);
+
+      text-align: center;
+
+      font-family:
+        monospace;
+    }
+
+
+    /* =========================================================
+       DISCLOSURE
+    ========================================================= */
+
+    .disclosure {
+      display: grid;
+
+      grid-template-columns:
+        .8fr
+        1.2fr;
+
+      gap: 100px;
+
+      align-items: center;
+    }
+
+    .disclosure h2 {
+      font-size: clamp(
+        50px,
+        6vw,
+        82px
+      );
+
+      line-height: .88;
+
+      letter-spacing: -.08em;
+    }
+
+    .disclosure h2 span {
+      color: rgba(255,255,255,.2);
+    }
+
+    .disclosure-copy p {
+      color: rgba(255,255,255,.35);
+
+      font-size: 14px;
+
+      line-height: 1.8;
+    }
+
+    .security-email {
+      display: inline-flex;
+
+      margin-top: 30px;
+
+      padding: 14px 18px;
+
+      border:
+        1px solid rgba(0,229,255,.22);
+
+      color: #00e5ff;
+
+      text-decoration: none;
+
+      font-family:
+        monospace;
+
+      font-size: 11px;
+
+      transition:
+        background .25s ease,
+        border-color .25s ease;
+    }
+
+    .security-email:hover {
+      background:
+        rgba(0,229,255,.05);
+
+      border-color:
+        rgba(0,229,255,.5);
+    }
+
+
+    /* =========================================================
+       RESPONSIBILITY
+    ========================================================= */
+
+    .responsibility {
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 1px;
+
+      background:
+        rgba(255,255,255,.07);
+
+      border:
+        1px solid rgba(255,255,255,.07);
+    }
+
+    .responsibility-card {
+      padding: 45px;
+
+      background: #020202;
+    }
+
+    .responsibility-card h3 {
+      margin-bottom: 25px;
+
+      font-size: 17px;
+
+      letter-spacing: -.04em;
+    }
+
+    .responsibility-card ul {
+      list-style: none;
+    }
+
+    .responsibility-card li {
+      position: relative;
+
+      padding: 12px 0 12px 22px;
+
+      border-bottom:
+        1px solid rgba(255,255,255,.05);
+
+      color: rgba(255,255,255,.3);
+
+      font-size: 11px;
+    }
+
+    .responsibility-card li::before {
+      content: "→";
+
+      position: absolute;
+
+      left: 0;
+
+      color: #00e5ff;
+    }
+
+
+    /* =========================================================
+       FINAL CTA
+    ========================================================= */
+
+    .final {
+      position: relative;
+
+      min-height: 80vh;
+
+      width: min(1280px, calc(100% - 48px));
+
+      margin: auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      text-align: center;
+
+      overflow: hidden;
+    }
+
+    .final-ring {
+      position: absolute;
+
+      width: 650px;
+      height: 650px;
+
+      border-radius: 50%;
+
+      border:
+        1px solid rgba(0,229,255,.06);
+
+      animation:
+        slowSpin
+        30s
+        linear
+        infinite;
+    }
+
+    .final-ring::before,
+    .final-ring::after {
+      content: "";
+
+      position: absolute;
+
+      inset: 80px;
+
+      border-radius: 50%;
+
+      border:
+        1px dashed rgba(138,92,255,.08);
+    }
+
+    .final-ring::after {
+      inset: 180px;
+
+      border-style: solid;
+
+      border-color:
+        rgba(0,229,255,.08);
+    }
+
+    @keyframes slowSpin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .final-content {
+      position: relative;
+
+      z-index: 2;
+
+      max-width: 850px;
+    }
+
+    .final-content h2 {
+      font-size: clamp(
+        55px,
+        8vw,
+        110px
+      );
+
+      line-height: .85;
+
+      letter-spacing: -.09em;
+    }
+
+    .final-content h2 span {
+      color: rgba(255,255,255,.2);
+    }
+
+    .final-content p {
+      max-width: 550px;
+
+      margin: 30px auto;
+
+      color: rgba(255,255,255,.32);
+
+      font-size: 13px;
+
+      line-height: 1.7;
+    }
+
+    .cta {
+      display: inline-flex;
+
+      align-items: center;
+      gap: 14px;
+
+      padding: 16px 22px;
+
+      border:
+        1px solid rgba(0,229,255,.4);
+
+      color: #fff;
+
+      text-decoration: none;
+
+      background:
+        rgba(0,229,255,.04);
+
+      font-size: 11px;
+
+      font-weight: 650;
+
+      transition:
+        background .25s ease,
+        box-shadow .25s ease,
+        transform .25s ease;
+    }
+
+    .cta:hover {
+      background:
+        rgba(0,229,255,.1);
+
+      box-shadow:
+        0 0 45px rgba(0,229,255,.1);
+
+      transform:
+        translateY(-2px);
+    }
+
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+
+    footer {
+      position: relative;
+
+      z-index: 5;
+
+      width: min(1280px, calc(100% - 48px));
+
+      margin: auto;
+
+      padding: 35px 0 50px;
+
+      border-top:
+        1px solid rgba(255,255,255,.07);
+
+      display: flex;
+      justify-content: space-between;
+
+      color: rgba(255,255,255,.2);
+
+      font-size: 9px;
+
+      letter-spacing: .12em;
+    }
+
+
+    /* =========================================================
+       REVEAL
+    ========================================================= */
+
+    .reveal {
+      opacity: 0;
+
+      transform:
+        translateY(45px);
+
+      transition:
+        opacity 1s cubic-bezier(.16,1,.3,1),
+        transform 1s cubic-bezier(.16,1,.3,1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+
+      transform:
+        translateY(0);
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 950px) {
+
+      .model-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .descent,
+      .crypto,
+      .disclosure {
+        grid-template-columns: 1fr;
+      }
+
+      .descent-copy {
+        position: relative;
+        top: auto;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .pipeline {
+        grid-template-columns: repeat(3, 1fr);
+        row-gap: 45px;
+      }
+
+      .pipeline::before {
+        display: none;
+      }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+      nav,
+      .hero,
+      .section,
+      .final,
+      footer {
+        width: calc(100% - 32px);
+      }
+
+      .hero {
+        padding-top: 90px;
+      }
+
+      .hero h1 {
+        font-size: 64px;
+      }
+
+      .section {
+        padding: 100px 0;
+      }
+
+      .model-grid,
+      .practice-grid,
+      .responsibility {
+        grid-template-columns: 1fr;
+      }
+
+      .descent {
+        gap: 50px;
+      }
+
+      .layer-stack {
+        min-height: 700px;
+      }
+
+      .layer {
+        position: relative !important;
+
+        top: auto !important;
+
+        height: auto;
+
+        min-height: 145px;
+      }
+
+      .packet-interface {
+        height: 500px;
+      }
+
+      .network-node {
+        width: 75px;
+        height: 75px;
+
+        font-size: 7px;
+      }
+
+      .node-internet {
+        left: 4%;
+      }
+
+      .node-nic {
+        left: 25%;
+      }
+
+      .node-xdp {
+        width: 90px;
+        height: 90px;
+
+        left: 50%;
+      }
+
+      .node-kernel {
+        right: 25%;
+      }
+
+      .node-app {
+        right: 4%;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .metric {
+        padding: 20px;
+      }
+
+      .metric-value {
+        font-size: 27px;
+      }
+
+      .crypto-visual {
+        height: 400px;
+      }
+
+      .lattice {
+        width: 240px;
+        height: 240px;
+      }
+
+      .supply {
+        padding: 30px 18px;
+      }
+
+      .supply-flow {
+        flex-direction: column;
+      }
+
+      .flow-arrow {
+        height: 30px;
+        width: auto;
+
+        display: flex;
+        align-items: center;
+
+        transform: rotate(90deg);
+      }
+
+      .supply-box {
+        width: 100%;
+      }
+
+      .pipeline {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      footer {
+        flex-direction: column;
+
+        gap: 10px;
+      }
+
+    }
+
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <!-- =======================================================
+       BACKGROUND
+  ======================================================== -->
+
+  <div class="background">
+
+    <div class="grid"></div>
+
+    <div class="ambient one"></div>
+
+    <div class="ambient two"></div>
+
+  </div>
+
+  <div class="cursor"></div>
+
+
+  <!-- =======================================================
+       NAV
+  ======================================================== -->
+
+  <nav>
+
+    <a class="brand" href="./index.html">
+
+  
+
+      SafeSwitch Systems
+
+    </a>
+
+
+
+  </nav>
+
+
+  <main>
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <div class="">
+          SECURITY / ARCHITECTURE
+        </div>
+
+        <h1>
+          Security
+          <span class="dim">
+            from the packet up.
+          </span>
+        </h1>
+
+        <p class="hero-description">
+          SafeSwitch is designed around a simple principle:
+          critical network decisions should remain possible even
+          when the systems surrounding them are under pressure.
+        </p>
+
+        <div class="hero-status">
+
+          <span class=""></span>
+
+          SECURITY POSTURE
+
+          <p>: OPERATIONAL</p>
+
+        </div>
+
+      </div>
+
+
+      <div class="hero-core">
+
+        <div class="core-line"></div>
+
+        <div class="core-ring"></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SECURITY MODEL
+    ====================================================== -->
+
+    <section class="section reveal">
+
+      <div class="section-header">
+
+
+
+        <h2>
+          Remove the
+          <span>unnecessary trust.</span>
+        </h2>
+
+        <p class="section-description">
+          Security isn't a single feature. It's the sum of the
+          boundaries, dependencies, permissions and decisions
+          that exist between an incoming packet and the system
+          responsible for handling it.
+        </p>
+
+      </div>
+
+
+      <div class="model-grid">
+
+        <article class="model-card">
+
+          <div class="card-number"></div>
+
+
+
+          <h3>
+            Minimal Trust Surface
+          </h3>
+
+          <p>
+            Reduce the number of external systems that must remain
+            reachable for critical traffic decisions to continue.
+          </p>
+
+        </article>
+
+
+        <article class="model-card">
+
+          <div class="card-number"></div>
+
+
+
+          <h3>
+            Kernel-Level Enforcement
+          </h3>
+
+          <p>
+            Where appropriate, packet processing can happen close
+            to the network interface before traffic traverses
+            higher layers of the stack.
+          </p>
+
+        </article>
+
+
+        <article class="model-card">
+
+          <div class="card-number"></div>
+
+
+
+          <h3>
+            No Runtime API Dependency
+          </h3>
+
+          <p>
+            Critical data-plane behavior should not depend on a
+            cloud dashboard or external API responding at exactly
+            the moment a failure occurs.
+          </p>
+
+        </article>
+
+
+        <article class="model-card">
+
+          <div class="card-number"></div>
+
+
+
+          <h3>
+            Least Privilege
+          </h3>
+
+          <p>
+            Keep permissions narrow, explicit and auditable across
+            the components responsible for managing the system.
+          </p>
+
+        </article>
+
+
+        <article class="model-card">
+
+          <div class="card-number"></div>
+
+
+
+          <h3>
+            Observable by Design
+          </h3>
+
+          <p>
+            Security-relevant behavior should be measurable,
+            inspectable and correlated with the infrastructure
+            events surrounding it.
+          </p>
+
+        </article>
+
+
+        <article class="model-card">
+
+          <div class="card-number"></div>
+
+
+          <h3>
+            Controlled Rollback
+          </h3>
+
+          <p>
+            Changes to critical infrastructure should have a
+            predictable path back to a known-good state.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DESCENT
+    ====================================================== -->
+
+    <section class="section descent reveal">
+
+      <div class="descent-copy">
+
+
+
+        <h2>
+          Go deeper.
+          <span>Trust less.</span>
+        </h2>
+
+        <p>
+          The closer a system gets to the actual packet path,
+          the more important its security boundaries become.
+          SafeSwitch is designed around explicit layers rather
+          than one enormous trusted application.
+        </p>
+
+      </div>
+
+
+      <div class="layer-stack">
+
+
+        <div class="layer active">
+
+          <div class="layer-top">
+
+            <span class="layer-name">
+              INTERNET
+            </span>
+
+            <span class="layer-tag">
+              UNTRUSTED
+            </span>
+
+          </div>
+
+          <p>
+            Traffic arrives from networks that SafeSwitch does not
+            control and therefore treats as potentially hostile.
+          </p>
+
+        </div>
+
+
+        <div class="layer">
+
+          <div class="layer-top">
+
+            <span class="layer-name">
+              NETWORK INTERFACE
+            </span>
+
+            <span class="layer-tag">
+              EDGE
+            </span>
+
+          </div>
+
+          <p>
+            The NIC becomes the first meaningful observation point
+            for traffic entering the host.
+          </p>
+
+        </div>
+
+
+        <div class="layer">
+
+          <div class="layer-top">
+
+            <span class="layer-name">
+              XDP
+            </span>
+
+            <span class="layer-tag">
+              EARLY PATH
+            </span>
+
+          </div>
+
+          <p>
+            XDP provides a location for extremely early packet
+            processing before traffic travels through the normal
+            networking path.
+          </p>
+
+        </div>
+
+
+        <div class="layer">
+
+          <div class="layer-top">
+
+            <span class="layer-name">
+              eBPF
+            </span>
+
+            <span class="layer-tag">
+              VERIFIED PROGRAMS
+            </span>
+
+          </div>
+
+          <p>
+            eBPF programs and maps provide programmable kernel
+            behavior while remaining subject to the Linux kernel's
+            verification and execution model.
+          </p>
+
+        </div>
+
+
+        <div class="layer">
+
+          <div class="layer-top">
+
+            <span class="layer-name">
+              APPLICATION
+            </span>
+
+            <span class="layer-tag">
+              LAST
+            </span>
+
+          </div>
+
+          <p>
+            Legitimate traffic eventually reaches the application
+            layer, where application-level security controls
+            continue to apply.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PACKET VISUAL
+    ====================================================== -->
+
+    <section class="section packet-section reveal">
+
+      <div style="width:100%;">
+
+        <div class="section-header">
+
+
+          <h2>
+            Stop bad traffic
+            <span>before it becomes work.</span>
+          </h2>
+
+          <p class="section-description">
+            The following visualization represents the intended
+            packet-processing model. It is a conceptual simulation,
+            not a production traffic measurement.
+          </p>
+
+        </div>
+
+
+        <div class="packet-interface">
+
+          <div class="packet-title">
+            LIVE PACKET PATH / SIMULATION
+          </div>
+
+          <div class="connection"></div>
+
+          <div class="network-node node-internet">
+            INTERNET
+            <small>INGRESS</small>
+          </div>
+
+          <div class="network-node node-nic">
+            NIC
+            <small>RECEIVE</small>
+          </div>
+
+          <div class="network-node node-xdp">
+            XDP
+            <small>DECIDE</small>
+          </div>
+
+          <div class="network-node node-kernel">
+            KERNEL
+            <small>PROCESS</small>
+          </div>
+
+          <div class="network-node node-app">
+            APP
+            <small>SERVE</small>
+          </div>
+
+
+          <div class="packet"></div>
+          <div class="packet" style="animation-delay:.8s"></div>
+          <div class="packet" style="animation-delay:1.6s"></div>
+
+          <div
+            class="packet red"
+            style="animation-delay:.3s"
+          ></div>
+
+          <div
+            class="packet red"
+            style="animation-delay:1.2s"
+          ></div>
+
+          <div
+            class="packet red"
+            style="animation-delay:2.1s"
+          ></div>
+
+          <div class="drop-zone"></div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         METRICS
+    ====================================================== -->
+
+    <section class="section reveal">
+
+      <div class="metrics">
+
+        <div class="metric">
+
+          <span
+            class="metric-value cyan"
+            data-count="170"
+          >
+            0
+          </span>
+
+          <span class="metric-label">
+            EXAMPLE PPS / SIMULATION
+          </span>
+
+        </div>
+
+
+        <div class="metric">
+
+          <span
+            class="metric-value green"
+            data-count="2"
+          >
+            0
+          </span>
+
+          <span class="metric-label">
+            EXAMPLE CPU / SIMULATION
+          </span>
+
+        </div>
+
+
+        <div class="metric">
+
+          <span
+            class="metric-value purple"
+            data-count="100"
+          >
+            0
+          </span>
+
+          <span class="metric-label">
+            SIGNED RELEASES / TARGET
+          </span>
+
+        </div>
+
+
+        <div class="metric">
+
+          <span class="metric-value">
+            XDP
+          </span>
+
+          <span class="metric-label">
+            PROCESSING LAYER
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ENGINEERING PRACTICES
+    ====================================================== -->
+
+    <section class="section reveal">
+
+      <div class="section-header">
+
+
+
+        <h2>
+          Security is
+          <span>an engineering discipline.</span>
+        </h2>
+
+        <p class="section-description">
+          The strongest security claims are backed by boring,
+          repeatable engineering processes.
+        </p>
+
+      </div>
+
+
+      <div class="practice-grid">
+
+        <article class="practice">
+
+          <div class="practice-number">
+            04.01
+          </div>
+
+          <h3>
+            Kernel Compatibility
+          </h3>
+
+          <p>
+            Kernel-level software needs explicit compatibility
+            testing across supported kernels, distributions and
+            deployment environments.
+          </p>
+
+        </article>
+
+
+        <article class="practice">
+
+          <div class="practice-number">
+            04.02
+          </div>
+
+          <h3>
+            eBPF Verification
+          </h3>
+
+          <p>
+            eBPF programs operate within the Linux kernel's
+            verification and execution model. Program behavior,
+            map access and lifecycle should remain tightly
+            controlled.
+          </p>
+
+        </article>
+
+
+        <article class="practice">
+
+          <div class="practice-number">
+            04.03
+          </div>
+
+          <h3>
+            Dependency Discipline
+          </h3>
+
+          <p>
+            Dependencies should be inventoried, reviewed and
+            continuously evaluated for known vulnerabilities
+            and unnecessary exposure.
+          </p>
+
+        </article>
+
+
+        <article class="practice">
+
+          <div class="practice-number">
+            04.04
+          </div>
+
+          <h3>
+            Reproducible Operations
+          </h3>
+
+          <p>
+            Critical configuration and infrastructure changes
+            should be versioned, reviewable and capable of being
+            rolled back to a known-good state.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         RELEASE PIPELINE
+    ====================================================== -->
+
+    <section class="section reveal">
+
+      <div class="section-header">
+
+
+
+        <h2>
+          Change the system
+          <span>without losing control.</span>
+        </h2>
+
+      </div>
+
+
+      <div class="pipeline">
+
+        <div class="pipeline-step">
+
+          <div class="pipeline-node">
+            SRC
+          </div>
+
+          <h4>
+            SOURCE
+          </h4>
+
+          <p>
+            Versioned code
+          </p>
+
+        </div>
+
+
+        <div class="pipeline-step">
+
+          <div class="pipeline-node">
+            TEST
+          </div>
+
+          <h4>
+            VALIDATE
+          </h4>
+
+          <p>
+            Automated checks
+          </p>
+
+        </div>
+
+
+        <div class="pipeline-step">
+
+          <div class="pipeline-node">
+            SBOM
+          </div>
+
+          <h4>
+            INVENTORY
+          </h4>
+
+          <p>
+            Dependency visibility
+          </p>
+
+        </div>
+
+
+        <div class="pipeline-step">
+
+          <div class="pipeline-node">
+            SIGN
+          </div>
+
+          <h4>
+            SIGN
+          </h4>
+
+          <p>
+            Release integrity
+          </p>
+
+        </div>
+
+
+        <div class="pipeline-step">
+
+          <div class="pipeline-node">
+            STAGE
+          </div>
+
+          <h4>
+            STAGE
+          </h4>
+
+          <p>
+            Controlled rollout
+          </p>
+
+        </div>
+
+
+        <div class="pipeline-step">
+
+          <div class="pipeline-node">
+            ↩
+          </div>
+
+          <h4>
+            ROLLBACK
+          </h4>
+
+          <p>
+            Known-good state
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CRYPTOGRAPHY
+    ====================================================== -->
+
+    <section class="section crypto reveal">
+
+      <div class="crypto-visual">
+
+        <div class="lattice">
+
+          <div class="lattice-line horizontal" style="top:10%"></div>
+          <div class="lattice-line horizontal" style="top:20%"></div>
+          <div class="lattice-line horizontal" style="top:30%"></div>
+          <div class="lattice-line horizontal" style="top:40%"></div>
+          <div class="lattice-line horizontal" style="top:50%"></div>
+          <div class="lattice-line horizontal" style="top:60%"></div>
+          <div class="lattice-line horizontal" style="top:70%"></div>
+          <div class="lattice-line horizontal" style="top:80%"></div>
+          <div class="lattice-line horizontal" style="top:90%"></div>
+
+          <div class="lattice-line vertical" style="left:10%"></div>
+          <div class="lattice-line vertical" style="left:20%"></div>
+          <div class="lattice-line vertical" style="left:30%"></div>
+          <div class="lattice-line vertical" style="left:40%"></div>
+          <div class="lattice-line vertical" style="left:50%"></div>
+          <div class="lattice-line vertical" style="left:60%"></div>
+          <div class="lattice-line vertical" style="left:70%"></div>
+          <div class="lattice-line vertical" style="left:80%"></div>
+          <div class="lattice-line vertical" style="left:90%"></div>
+
+        </div>
+
+        <div class="crypto-core">
+          ML-KEM
+        </div>
+
+      </div>
+
+
+      <div class="crypto-copy">
+
+
+
+        <h2>
+          Preparing for
+          <span>what comes next.</span>
+        </h2>
+
+        <p>
+          Post-quantum cryptography is an architectural
+          consideration, not a marketing checkbox. SafeSwitch
+          is designed with room for cryptographic state and
+          future key-management models to evolve without
+          requiring the data plane to be fundamentally rebuilt.
+        </p>
+
+        <div class="crypto-badge">
+          PQC / ML-KEM READY ARCHITECTURE
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SUPPLY CHAIN
+    ====================================================== -->
+
+    <section class="section reveal">
+
+      <div class="supply">
+
+        <div class="supply-title">
+
+
+          <h2>
+            Know what
+            <span>you deploy.</span>
+          </h2>
+
+          <p>
+            Software security starts before the artifact reaches
+            production.
+          </p>
+
+        </div>
+
+
+        <div class="supply-flow">
+
+          <div class="supply-box">
+
+            <strong>
+              SOURCE
+            </strong>
+
+            <span>
+              VERSION CONTROL
+            </span>
+
+          </div>
+
+          <div class="flow-arrow">
+            →
+          </div>
+
+          <div class="supply-box">
+
+            <strong>
+              BUILD
+            </strong>
+
+            <span>
+              CONTROLLED
+            </span>
+
+          </div>
+
+          <div class="flow-arrow">
+            →
+          </div>
+
+          <div class="supply-box">
+
+            <strong>
+              SBOM
+            </strong>
+
+            <span>
+              DEPENDENCIES
+            </span>
+
+          </div>
+
+          <div class="flow-arrow">
+            →
+          </div>
+
+          <div class="supply-box">
+
+            <strong>
+              SIGN
+            </strong>
+
+            <span>
+              INTEGRITY
+            </span>
+
+          </div>
+
+          <div class="flow-arrow">
+            →
+          </div>
+
+          <div class="supply-box">
+
+            <strong>
+              DEPLOY
+            </strong>
+
+            <span>
+              VERIFIED ARTIFACT
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         RESPONSIBLE DISCLOSURE
+    ====================================================== -->
+
+    <section class="section disclosure reveal">
+
+      <div>
+
+
+
+        <h2>
+          Find a hole?
+          <span>Tell us.</span>
+        </h2>
+
+      </div>
+
+
+      <div class="disclosure-copy">
+
+        <p>
+          Security research makes infrastructure stronger.
+          If you discover a vulnerability affecting SafeSwitch,
+          please report it responsibly so the engineering team
+          can investigate and respond.
+        </p>
+
+        <a
+          class="security-email"
+          href="mailto:security@safeswitch.systems"
+        >
+          security@safeswitch.systems →
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SHARED RESPONSIBILITY
+    ====================================================== -->
+
+    <section class="section reveal">
+
+      <div class="section-header">
+
+
+
+        <h2>
+          Security works
+          <span>both ways.</span>
+        </h2>
+
+      </div>
+
+
+      <div class="responsibility">
+
+        <div class="responsibility-card">
+
+          <h3>
+            SafeSwitch
+          </h3>
+
+          <ul>
+
+            <li>
+              eBPF / XDP software security
+            </li>
+
+            <li>
+              Release integrity
+            </li>
+
+            <li>
+              Vulnerability response
+            </li>
+
+            <li>
+              Platform security
+            </li>
+
+            <li>
+              Security architecture
+            </li>
+
+          </ul>
+
+        </div>
+
+
+        <div class="responsibility-card">
+
+          <h3>
+            Customer
+          </h3>
+
+          <ul>
+
+            <li>
+              Host and operating system security
+            </li>
+
+            <li>
+              Credentials and secrets
+            </li>
+
+            <li>
+              Network configuration
+            </li>
+
+            <li>
+              Application security
+            </li>
+
+            <li>
+              Physical infrastructure
+            </li>
+
+          </ul>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         FINAL
+    ====================================================== -->
+
+    <section class="final reveal">
+
+      <div class="final-ring"></div>
+
+      <div class="final-content">
+
+
+        <h2>
+          Want to inspect
+          <span>the architecture?</span>
+        </h2>
+
+        <p>
+          Security claims should survive technical questions.
+          Talk directly with the people building SafeSwitch and
+          go as deep into the architecture as you want.
+        </p>
+
+        <a
+          href="./contactus.html"
+          class="cta"
+        >
+          Talk to an engineer
+          <span>→</span>
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =======================================================
+       FOOTER
+  ======================================================== -->
+
+  <footer>
+
+    <span>
+      SAFESWITCH SYSTEMS
+    </span>
+
+    <span>
+      SECURITY / 2026
+    </span>
+
+    <span>
+      KERNEL-SPEED INFRASTRUCTURE
+    </span>
+
+  </footer>
+
+
+  <script>
+
+    /* =========================================================
+       CURSOR GLOW
+    ========================================================= */
+
+    const cursor =
+      document.querySelector(".cursor");
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    let currentX = mouseX;
+    let currentY = mouseY;
+
+    window.addEventListener("mousemove", (event) => {
+
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+
+    });
+
+
+    function animateCursor() {
+
+      currentX +=
+        (mouseX - currentX) * .08;
+
+      currentY +=
+        (mouseY - currentY) * .08;
+
+      cursor.style.left =
+        currentX + "px";
+
+      cursor.style.top =
+        currentY + "px";
+
+      requestAnimationFrame(
+        animateCursor
+      );
+
+    }
+
+    animateCursor();
+
+
+    /* =========================================================
+       REVEAL ON SCROLL
+    ========================================================= */
+
+    const reveals =
+      document.querySelectorAll(".reveal");
+
+    const observer =
+      new IntersectionObserver(
+        (entries) => {
+
+          entries.forEach((entry) => {
+
+            if (
+              entry.isIntersecting
+            ) {
+
+              entry.target.classList.add(
+                "visible"
+              );
+
+            }
+
+          });
+
+        },
+        {
+          threshold: .12
+        }
+      );
+
+
+    reveals.forEach((element) => {
+
+      observer.observe(element);
+
+    });
+
+
+    /* =========================================================
+       LAYER SCROLL EFFECT
+    ========================================================= */
+
+    const layers =
+      document.querySelectorAll(".layer");
+
+    window.addEventListener(
+      "scroll",
+      () => {
+
+        layers.forEach(
+          (layer, index) => {
+
+            const rect =
+              layer.getBoundingClientRect();
+
+            const center =
+              window.innerHeight / 2;
+
+            const distance =
+              Math.abs(
+                rect.top +
+                rect.height / 2 -
+                center
+              );
+
+            if (distance < 240) {
+
+              layer.classList.add(
+                "active"
+              );
+
+            } else {
+
+              layer.classList.remove(
+                "active"
+              );
+
+            }
+
+          }
+        );
+
+      },
+      {
+        passive: true
+      }
+    );
+
+
+    /* =========================================================
+       COUNTER ANIMATION
+    ========================================================= */
+
+    const counters =
+      document.querySelectorAll(
+        "[data-count]"
+      );
+
+    const counterObserver =
+      new IntersectionObserver(
+        (entries, observer) => {
+
+          entries.forEach((entry) => {
+
+            if (
+              !entry.isIntersecting
+            ) {
+              return;
+            }
+
+            const element =
+              entry.target;
+
+            const target =
+              Number(
+                element.dataset.count
+              );
+
+            let current = 0;
+
+            const duration = 1300;
+
+            const start =
+              performance.now();
+
+            function update(time) {
+
+              const progress =
+                Math.min(
+                  (time - start) /
+                  duration,
+                  1
+                );
+
+              const eased =
+                1 -
+                Math.pow(
+                  1 - progress,
+                  4
+                );
+
+              current =
+                Math.round(
+                  target * eased
+                );
+
+              element.textContent =
+                current +
+                (
+                  target === 170
+                    ? "K"
+                    : "%"
+                );
+
+              if (
+                progress < 1
+              ) {
+
+                requestAnimationFrame(
+                  update
+                );
+
+              }
+
+            }
+
+            requestAnimationFrame(
+              update
+            );
+
+            observer.unobserve(
+              element
+            );
+
+          });
+
+        },
+        {
+          threshold: .6
+        }
+      );
+
+
+    counters.forEach(
+      (counter) => {
+
+        counterObserver.observe(
+          counter
+        );
+
+      }
+    );
+
+
+    /* =========================================================
+       MAGNETIC CTA
+    ========================================================= */
+
+    const cta =
+      document.querySelector(".cta");
+
+    if (cta) {
+
+      cta.addEventListener(
+        "mousemove",
+        (event) => {
+
+          const rect =
+            cta.getBoundingClientRect();
+
+          const x =
+            event.clientX -
+            rect.left -
+            rect.width / 2;
+
+          const y =
+            event.clientY -
+            rect.top -
+            rect.height / 2;
+
+          cta.style.transform =
+            `
+            translate(
+              ${x * .08}px,
+              ${y * .12}px
+            )
+            `;
+
+        }
+      );
+
+      cta.addEventListener(
+        "mouseleave",
+        () => {
+
+          cta.style.transform =
+            "";
+
+        }
+      );
+
+    }
+
+
+    /* =========================================================
+       PACKET DENSITY
+       Adds extra packet particles after page interaction.
+    ========================================================= */
+
+    const packetInterface =
+      document.querySelector(
+        ".packet-interface"
+      );
+
+    let packetBurst = false;
+
+    packetInterface.addEventListener(
+      "mouseenter",
+      () => {
+
+        if (packetBurst) return;
+
+        packetBurst = true;
+
+        for (
+          let i = 0;
+          i < 12;
+          i++
+        ) {
+
+          const packet =
+            document.createElement(
+              "div"
+            );
+
+          packet.className =
+            i % 3 === 0
+              ? "packet red"
+              : "packet";
+
+          packet.style.animationDelay =
+            `${i * .13}s`;
+
+          packetInterface.appendChild(
+            packet
+          );
+
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       PARALLAX AMBIENCE
+    ========================================================= */
+
+    window.addEventListener(
+      "scroll",
+      () => {
+
+        const scroll =
+          window.scrollY;
+
+        document
+          .querySelectorAll(".ambient")
+          .forEach(
+            (element, index) => {
+
+              const speed =
+                index === 0
+                  ? .025
+                  : -.018;
+
+              element.style.transform =
+                `
+                translateY(
+                  ${scroll * speed}px
+                )
+                `;
+
+            }
+          );
+
+      },
+      {
+        passive: true
+      }
+    );
+
+  </script>
+
+</body>
+</html>

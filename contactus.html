@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Contact — SafeSwitch Systems</title>
+
+  <meta
+    name="description"
+    content="Talk to the SafeSwitch Systems infrastructure team about kernel-speed failover, eBPF, XDP, and resilient network infrastructure."
+  />
+
+  <style>
+
+    /* =========================================================
+       RESET
+    ========================================================= */
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: #000;
+    }
+
+    body {
+      min-height: 100vh;
+
+      background:
+        radial-gradient(
+          circle at 50% 0%,
+          rgba(0, 229, 255, .045),
+          transparent 32%
+        ),
+        #000;
+
+      color: #fff;
+
+      font-family:
+        Inter,
+        Geist,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      -webkit-font-smoothing: antialiased;
+
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+
+    /* =========================================================
+       BACKGROUND GRID
+    ========================================================= */
+
+    .grid {
+      position: fixed;
+      inset: 0;
+
+      pointer-events: none;
+
+      opacity: .22;
+
+      background-image:
+        linear-gradient(
+          rgba(255,255,255,.025) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,.025) 1px,
+          transparent 1px
+        );
+
+      background-size: 70px 70px;
+
+      mask-image:
+        linear-gradient(
+          to bottom,
+          black,
+          transparent 85%
+        );
+
+      -webkit-mask-image:
+        linear-gradient(
+          to bottom,
+          black,
+          transparent 85%
+        );
+
+      z-index: 0;
+    }
+
+
+    /* =========================================================
+       CURSOR GLOW
+    ========================================================= */
+
+    .cursor-glow {
+      position: fixed;
+
+      width: 420px;
+      height: 420px;
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(0,229,255,.055),
+          transparent 68%
+        );
+
+      transform: translate(-50%, -50%);
+
+      pointer-events: none;
+
+      z-index: 0;
+
+      filter: blur(20px);
+
+      transition:
+        left .15s ease-out,
+        top .15s ease-out;
+    }
+
+
+    /* =========================================================
+       NAVIGATION
+    ========================================================= */
+
+    nav {
+      position: relative;
+
+      z-index: 20;
+
+      width: min(1240px, calc(100% - 48px));
+
+      height: 86px;
+
+      margin: 0 auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      border-bottom:
+        1px solid rgba(255,255,255,.07);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+
+      color: #fff;
+
+      text-decoration: none;
+
+      font-size: 15px;
+      font-weight: 650;
+
+      letter-spacing: -.03em;
+    }
+
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+
+      border-radius: 50%;
+
+      background: #00e5ff;
+
+      box-shadow:
+        0 0 10px rgba(0,229,255,.8),
+        0 0 25px rgba(0,229,255,.35);
+    }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      color: rgba(255,255,255,.35);
+
+      font-size: 10px;
+      font-weight: 600;
+
+      letter-spacing: .16em;
+    }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+
+      border-radius: 50%;
+
+      background: #62ffb0;
+
+      box-shadow:
+        0 0 10px rgba(98,255,176,.6);
+    }
+
+
+    /* =========================================================
+       MAIN
+    ========================================================= */
+
+    main {
+      position: relative;
+
+      z-index: 2;
+
+      width: min(1240px, calc(100% - 48px));
+
+      margin: 0 auto;
+
+      padding: 105px 0 150px;
+    }
+
+
+    /* =========================================================
+       HERO
+    ========================================================= */
+
+    .hero {
+      max-width: 850px;
+
+      margin-bottom: 85px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      margin-bottom: 26px;
+
+      color: rgba(255,255,255,.35);
+
+      font-size: 10px;
+      font-weight: 600;
+
+      letter-spacing: .22em;
+    }
+
+    .eyebrow::before {
+      content: "";
+
+      width: 5px;
+      height: 5px;
+
+      border-radius: 50%;
+
+      background: #00e5ff;
+
+      box-shadow:
+        0 0 10px #00e5ff,
+        0 0 25px rgba(0,229,255,.35);
+    }
+
+    h1 {
+      max-width: 850px;
+
+      font-size: clamp(
+        56px,
+        8vw,
+        104px
+      );
+
+      line-height: .89;
+
+      letter-spacing: -.075em;
+
+      font-weight: 600;
+    }
+
+    h1 span {
+      color: rgba(255,255,255,.27);
+    }
+
+    .hero-description {
+      max-width: 650px;
+
+      margin-top: 32px;
+
+      color: rgba(255,255,255,.43);
+
+      font-size: 16px;
+
+      line-height: 1.75;
+    }
+
+
+    /* =========================================================
+       CONTACT GRID
+    ========================================================= */
+
+    .contact-grid {
+      display: grid;
+
+      grid-template-columns:
+        minmax(260px, .75fr)
+        minmax(0, 1.4fr);
+
+      gap: 70px;
+
+      align-items: start;
+    }
+
+
+    /* =========================================================
+       LEFT SIDE
+    ========================================================= */
+
+    .contact-info {
+      position: sticky;
+
+      top: 40px;
+    }
+
+    .info-heading {
+      margin-bottom: 30px;
+
+      font-size: 12px;
+      font-weight: 600;
+
+      color: rgba(255,255,255,.34);
+
+      letter-spacing: .16em;
+    }
+
+    .contact-method {
+      padding: 25px 0;
+
+      border-top:
+        1px solid rgba(255,255,255,.07);
+    }
+
+    .contact-method:last-child {
+      border-bottom:
+        1px solid rgba(255,255,255,.07);
+    }
+
+    .method-label {
+      margin-bottom: 9px;
+
+      color: rgba(255,255,255,.28);
+
+      font-size: 10px;
+
+      letter-spacing: .15em;
+
+      text-transform: uppercase;
+    }
+
+    .method-value {
+      color: rgba(255,255,255,.78);
+
+      font-size: 15px;
+
+      text-decoration: none;
+
+      transition: color .25s ease;
+    }
+
+    .method-value:hover {
+      color: #00e5ff;
+    }
+
+
+    /* =========================================================
+       RESPONSE BOX
+    ========================================================= */
+
+    .response-box {
+      position: relative;
+
+      margin-top: 35px;
+
+      padding: 23px;
+
+      border:
+        1px solid rgba(0,229,255,.12);
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(0,229,255,.045),
+          rgba(137,66,255,.025)
+        );
+
+      overflow: hidden;
+    }
+
+    .response-box::before {
+      content: "";
+
+      position: absolute;
+
+      left: 0;
+      top: 0;
+      bottom: 0;
+
+      width: 2px;
+
+      background:
+        linear-gradient(
+          #00e5ff,
+          #874cff
+        );
+    }
+
+    .response-title {
+      margin-bottom: 8px;
+
+      font-size: 12px;
+
+      font-weight: 650;
+    }
+
+    .response-text {
+      color: rgba(255,255,255,.37);
+
+      font-size: 12px;
+
+      line-height: 1.6;
+    }
+
+
+    /* =========================================================
+       FORM
+    ========================================================= */
+
+    .form-card {
+      position: relative;
+
+      padding: 45px;
+
+      border:
+        1px solid rgba(255,255,255,.09);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,.035),
+          rgba(255,255,255,.012)
+        );
+
+      box-shadow:
+        0 40px 100px rgba(0,0,0,.4);
+
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .form-card::before {
+      content: "";
+
+      position: absolute;
+
+      top: 0;
+      left: 0;
+
+      width: 100%;
+      height: 1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(0,229,255,.45),
+          transparent
+        );
+    }
+
+    .form-header {
+      margin-bottom: 40px;
+    }
+
+    .form-header h2 {
+      margin-bottom: 10px;
+
+      font-size: 25px;
+
+      letter-spacing: -.045em;
+    }
+
+    .form-header p {
+      color: rgba(255,255,255,.34);
+
+      font-size: 13px;
+
+      line-height: 1.6;
+    }
+
+
+    /* =========================================================
+       FORM FIELDS
+    ========================================================= */
+
+    .form-row {
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 18px;
+    }
+
+    .field {
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+
+      margin-bottom: 9px;
+
+      color: rgba(255,255,255,.42);
+
+      font-size: 10px;
+
+      font-weight: 600;
+
+      letter-spacing: .12em;
+
+      text-transform: uppercase;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+
+      border: 1px solid rgba(255,255,255,.10);
+
+      outline: none;
+
+      background:
+        rgba(255,255,255,.025);
+
+      color: #fff;
+
+      border-radius: 0;
+
+      padding: 15px 16px;
+
+      font-size: 14px;
+
+      transition:
+        border-color .25s ease,
+        background .25s ease,
+        box-shadow .25s ease;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(255,255,255,.20);
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color:
+        rgba(0,229,255,.42);
+
+      background:
+        rgba(0,229,255,.025);
+
+      box-shadow:
+        0 0 0 3px rgba(0,229,255,.035);
+    }
+
+    textarea {
+      min-height: 150px;
+
+      resize: vertical;
+
+      line-height: 1.6;
+    }
+
+    select {
+      appearance: none;
+
+      background-image:
+        linear-gradient(
+          45deg,
+          transparent 50%,
+          rgba(255,255,255,.45) 50%
+        ),
+        linear-gradient(
+          135deg,
+          rgba(255,255,255,.45) 50%,
+          transparent 50%
+        );
+
+      background-position:
+        calc(100% - 17px) 50%,
+        calc(100% - 12px) 50%;
+
+      background-size:
+        5px 5px,
+        5px 5px;
+
+      background-repeat: no-repeat;
+    }
+
+    select option {
+      background: #080808;
+
+      color: #fff;
+    }
+
+
+    /* =========================================================
+       SUBMIT
+    ========================================================= */
+
+    .submit-row {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 25px;
+
+      margin-top: 10px;
+
+      padding-top: 25px;
+
+      border-top:
+        1px solid rgba(255,255,255,.07);
+    }
+
+    .form-note {
+      max-width: 300px;
+
+      color: rgba(255,255,255,.25);
+
+      font-size: 10px;
+
+      line-height: 1.6;
+    }
+
+    .submit {
+      position: relative;
+
+      display: inline-flex;
+
+      align-items: center;
+      justify-content: center;
+
+      gap: 12px;
+
+      min-width: 175px;
+
+      padding: 15px 22px;
+
+      border: 1px solid rgba(0,229,255,.42);
+
+      background: rgba(0,229,255,.06);
+
+      color: #fff;
+
+      font-size: 12px;
+
+      font-weight: 650;
+
+      letter-spacing: -.01em;
+
+      transition:
+        background .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease,
+        transform .25s ease;
+    }
+
+    .submit:hover {
+      background: rgba(0,229,255,.11);
+
+      border-color:
+        rgba(0,229,255,.8);
+
+      box-shadow:
+        0 0 35px rgba(0,229,255,.10);
+
+      transform: translateY(-1px);
+    }
+
+    .submit:active {
+      transform: translateY(0);
+    }
+
+    .submit-arrow {
+      transition: transform .25s ease;
+    }
+
+    .submit:hover .submit-arrow {
+      transform: translateX(4px);
+    }
+
+
+    /* =========================================================
+       SUCCESS STATE
+    ========================================================= */
+
+    .success {
+      display: none;
+
+      padding: 45px 0;
+    }
+
+    .success.active {
+      display: block;
+    }
+
+    .success-terminal {
+      border:
+        1px solid rgba(0,229,255,.18);
+
+      background: #030303;
+
+      padding: 25px;
+
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+
+      font-size: 12px;
+
+      line-height: 1.8;
+    }
+
+    .terminal-top {
+      display: flex;
+      gap: 7px;
+
+      margin-bottom: 25px;
+    }
+
+    .terminal-dot {
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: rgba(255,255,255,.15);
+    }
+
+    .terminal-line {
+      color: rgba(255,255,255,.35);
+    }
+
+    .terminal-success {
+      color: #62ffb0;
+    }
+
+    .terminal-cyan {
+      color: #00e5ff;
+    }
+
+    .success h2 {
+      margin: 30px 0 10px;
+
+      font-size: 32px;
+
+      letter-spacing: -.05em;
+    }
+
+    .success p {
+      color: rgba(255,255,255,.38);
+
+      font-size: 14px;
+
+      line-height: 1.7;
+    }
+
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+
+    footer {
+      position: relative;
+
+      z-index: 2;
+
+      width: min(1240px, calc(100% - 48px));
+
+      margin: 0 auto;
+
+      padding: 30px 0 45px;
+
+      border-top:
+        1px solid rgba(255,255,255,.07);
+
+      display: flex;
+
+      justify-content: space-between;
+
+      color: rgba(255,255,255,.22);
+
+      font-size: 10px;
+
+      letter-spacing: .08em;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 850px) {
+
+      main {
+        padding-top: 75px;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+
+        gap: 55px;
+      }
+
+      .contact-info {
+        position: static;
+      }
+
+      .form-card {
+        padding: 30px;
+      }
+
+    }
+
+    @media (max-width: 600px) {
+
+      nav {
+        width: min(100% - 32px, 1240px);
+      }
+
+      .nav-status {
+        display: none;
+      }
+
+      main {
+        width: calc(100% - 32px);
+
+        padding-bottom: 90px;
+      }
+
+      h1 {
+        font-size: 55px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+
+        gap: 0;
+      }
+
+      .form-card {
+        padding: 23px;
+      }
+
+      .submit-row {
+        flex-direction: column;
+
+        align-items: stretch;
+      }
+
+      .submit {
+        width: 100%;
+      }
+
+      footer {
+        width: calc(100% - 32px);
+
+        flex-direction: column;
+
+        gap: 10px;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <div class="grid"></div>
+  <div class="cursor-glow"></div>
+
+
+  <!-- =======================================================
+       NAV
+  ======================================================== -->
+
+  <nav>
+
+    <a href="./index.html" class="brand">
+
+      SafeSwitch Systems
+    </a>
+
+
+
+  </nav>
+
+
+  <!-- =======================================================
+       MAIN
+  ======================================================== -->
+
+  <main>
+
+    <section class="hero">
+
+
+
+      <h1>
+        Let's build systems
+        <span>that don't go down.</span>
+      </h1>
+
+      <p class="hero-description">
+        Tell us what you're building, what you're protecting,
+        and where your current infrastructure breaks under pressure.
+        Our engineering team will get back to you directly.
+      </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         CONTACT AREA
+    ====================================================== -->
+
+    <section class="contact-grid">
+
+
+      <!-- LEFT -->
+
+      <aside class="contact-info">
+
+        <div class="info-heading">
+          DIRECT CHANNELS
+        </div>
+
+
+        <div class="contact-method">
+
+          <div class="method-label">
+            General, Founder Email
+          </div>
+
+          <a
+            class="method-value"
+            href="mailto:hello@safeswitch.systems"
+          >
+            islam4ever.89.18@gmail.com
+          </a>
+
+        </div>
+
+
+
+
+
+
+
+
+        <div class="response-box">
+
+          <div class="response-title">
+            Engineering-led conversations
+          </div>
+
+          <div class="response-text">
+            For technical deployments, architecture reviews,
+            enterprise requirements, and infrastructure questions,
+            you'll speak directly with someone who understands
+            the underlying system.
+          </div>
+
+        </div>
+
+      </aside>
+
+
+      <!-- FORM -->
+
+      <div class="form-card">
+
+        <div class="form-header">
+
+          <h2>
+            Start a conversation.
+          </h2>
+
+          <p>
+            Give us enough context to understand your environment.
+            No sales maze. No automated qualification funnel.
+          </p>
+
+        </div>
+
+
+        <form id="contactForm">
+
+          <div class="form-row">
+
+            <div class="field">
+
+              <label for="name">
+                Name
+              </label>
+
+              <input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Your name"
+                required
+              />
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="email">
+                Work email
+              </label>
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@company.com"
+                required
+              />
+
+            </div>
+
+          </div>
+
+
+          <div class="form-row">
+
+            <div class="field">
+
+              <label for="company">
+                Company
+              </label>
+
+              <input
+                id="company"
+                name="company"
+                type="text"
+                placeholder="Company name"
+              />
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="role">
+                Role
+              </label>
+
+              <input
+                id="role"
+                name="role"
+                type="text"
+                placeholder="Infrastructure / Platform / CTO"
+              />
+
+            </div>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="interest">
+              What are you interested in?
+            </label>
+
+            <select
+              id="interest"
+              name="interest"
+            >
+
+              <option value="">
+                Select an area
+              </option>
+
+              <option>
+                Multi-region failover
+              </option>
+
+              <option>
+                eBPF / XDP infrastructure
+              </option>
+
+              <option>
+                DDoS mitigation
+              </option>
+              <option>
+                PQC security
+              </option>
+              <option>
+                Load Balanding
+              </option>
+              <option>
+                Anycast networks
+              </option>
+              <option>
+                Zero trust Security
+              </option>
+              <option>
+                Quantum-AI cloud
+              </option>
+              <option>
+                Enterprise deployment
+              </option>
+
+              <option>
+                Architecture review
+              </option>
+
+              <option>
+                Partnership
+              </option>
+
+              <option>
+                Research / other
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="message">
+              Tell us about your infrastructure
+            </label>
+
+            <textarea
+              id="message"
+              name="message"
+              placeholder="What are you running today? What happens when a region fails? What are you trying to improve?"
+              required
+            ></textarea>
+
+          </div>
+
+
+          <div class="submit-row">
+
+            <div class="form-note">
+              By submitting this form, you're starting a direct
+              conversation with the SafeSwitch team.
+            </div>
+
+            <button
+              class="submit"
+              type="submit"
+            >
+
+              Send request
+
+              <span class="submit-arrow">
+                →
+              </span>
+
+            </button>
+
+          </div>
+
+        </form>
+
+
+        <!-- SUCCESS -->
+
+        <div
+          class="success"
+          id="success"
+        >
+
+          <div class="success-terminal">
+
+            <div class="terminal-top">
+
+              <span class="terminal-dot"></span>
+              <span class="terminal-dot"></span>
+              <span class="terminal-dot"></span>
+
+            </div>
+
+            <div class="terminal-line">
+              $ safeswitch contact --initiate
+            </div>
+
+            <div class="terminal-line">
+              &gt; validating request...
+            </div>
+
+            <div class="terminal-line">
+              &gt; routing to infrastructure team...
+            </div>
+
+            <div class="terminal-success">
+              &gt; request accepted
+            </div>
+
+            <div>
+              &gt; status:
+              <span class="terminal-cyan">
+                ENGINEERING_REVIEW
+              </span>
+            </div>
+
+          </div>
+
+
+          <h2>
+            Message received.
+          </h2>
+
+          <p>
+            Your request has been queued for the SafeSwitch team.
+            We'll review the technical context and get back to you.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =======================================================
+       FOOTER
+  ======================================================== -->
+
+  <footer>
+
+    <span>
+      SAFESWITCH SYSTEMS
+    </span>
+
+    <span>
+      KERNEL-SPEED INFRASTRUCTURE
+    </span>
+
+    <span>
+      © 2026
+    </span>
+
+  </footer>
+
+
+  <script>
+
+    /* =========================================================
+       CURSOR LIGHT
+    ========================================================= */
+
+    const glow = document.querySelector(".cursor-glow");
+
+    document.addEventListener("mousemove", (event) => {
+
+      glow.style.left = event.clientX + "px";
+      glow.style.top = event.clientY + "px";
+
+    });
+
+
+    /* =========================================================
+       FORM INTERACTION
+       
+       NOTE:
+       This is a front-end demo.
+       Connect the submit handler to your backend/API later.
+    ========================================================= */
+
+    const form = document.getElementById("contactForm");
+    const success = document.getElementById("success");
+
+    form.addEventListener("submit", (event) => {
+
+      event.preventDefault();
+
+      const button = form.querySelector(".submit");
+
+      button.disabled = true;
+
+      button.innerHTML = `
+        Processing
+        <span class="submit-arrow">...</span>
+      `;
+
+      setTimeout(() => {
+
+        form.style.display = "none";
+
+        success.classList.add("active");
+
+      }, 900);
+
+    });
+
+  </script>
+
+</body>
+</html>

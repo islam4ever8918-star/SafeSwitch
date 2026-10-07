@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Team — SafeSwitch Systems</title>
+
+  <meta
+    name="description"
+    content="Meet the founder behind SafeSwitch Systems."
+  />
+
+  <style>
+    /* =========================================================
+       RESET
+    ========================================================= */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      background: #000;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+
+      background:
+        radial-gradient(
+          circle at 50% 15%,
+          rgba(0, 229, 255, .055),
+          transparent 32%
+        ),
+        #000;
+
+      color: #fff;
+
+      font-family:
+        Inter,
+        Geist,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      -webkit-font-smoothing: antialiased;
+    }
+
+
+    /* =========================================================
+       GLOBAL GRID
+    ========================================================= */
+
+    .grid {
+      position: fixed;
+      inset: 0;
+
+      pointer-events: none;
+
+      opacity: .18;
+
+      background-image:
+        linear-gradient(
+          rgba(255,255,255,.025) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,.025) 1px,
+          transparent 1px
+        );
+
+      background-size: 70px 70px;
+
+      mask-image:
+        linear-gradient(
+          to bottom,
+          black,
+          transparent 92%
+        );
+
+      -webkit-mask-image:
+        linear-gradient(
+          to bottom,
+          black,
+          transparent 92%
+        );
+
+      z-index: 0;
+    }
+
+
+    /* =========================================================
+       CURSOR LIGHT
+    ========================================================= */
+
+    .cursor-glow {
+      position: fixed;
+
+      width: 450px;
+      height: 450px;
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(0,229,255,.065),
+          transparent 68%
+        );
+
+      transform: translate(-50%, -50%);
+
+      pointer-events: none;
+
+      filter: blur(20px);
+
+      z-index: 1;
+
+      transition:
+        left .15s ease-out,
+        top .15s ease-out;
+    }
+
+
+    /* =========================================================
+       NAV
+    ========================================================= */
+
+    nav {
+      position: relative;
+
+      z-index: 20;
+
+      width: min(1240px, calc(100% - 48px));
+
+      height: 86px;
+
+      margin: auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      border-bottom:
+        1px solid rgba(255,255,255,.07);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+
+      gap: 11px;
+
+      color: #fff;
+
+      text-decoration: none;
+
+      font-size: 15px;
+
+      font-weight: 650;
+
+      letter-spacing: -.035em;
+    }
+
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+
+      border-radius: 50%;
+
+      background: #00e5ff;
+
+      box-shadow:
+        0 0 10px #00e5ff,
+        0 0 28px rgba(0,229,255,.45);
+
+      animation:
+        pulse-dot
+        2s
+        ease-in-out
+        infinite;
+    }
+
+    @keyframes pulse-dot {
+
+      0%, 100% {
+        transform: scale(1);
+        opacity: .8;
+      }
+
+      50% {
+        transform: scale(1.35);
+        opacity: 1;
+      }
+
+    }
+
+    .nav-label {
+      color: rgba(255,255,255,.28);
+
+      font-size: 10px;
+
+      letter-spacing: .18em;
+
+      font-weight: 600;
+    }
+
+
+    /* =========================================================
+       MAIN
+    ========================================================= */
+
+    main {
+      position: relative;
+
+      z-index: 2;
+
+      width: min(1240px, calc(100% - 48px));
+
+      margin: auto;
+
+      padding: 110px 0 150px;
+    }
+
+
+    /* =========================================================
+       HERO
+    ========================================================= */
+
+    .hero {
+      text-align: center;
+
+      margin-bottom: 100px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+
+      gap: 10px;
+
+      margin-bottom: 25px;
+
+      color: rgba(255,255,255,.34);
+
+      font-size: 10px;
+
+      font-weight: 600;
+
+      letter-spacing: .24em;
+    }
+
+    .eyebrow::before {
+      content: "";
+
+      width: 5px;
+      height: 5px;
+
+      border-radius: 50%;
+
+      background: #00e5ff;
+
+      box-shadow:
+        0 0 12px #00e5ff,
+        0 0 30px rgba(0,229,255,.35);
+    }
+
+    .hero h1 {
+      font-size: clamp(
+        65px,
+        10vw,
+        130px
+      );
+
+      line-height: .84;
+
+      letter-spacing: -.085em;
+
+      font-weight: 600;
+    }
+
+    .hero h1 span {
+      display: block;
+
+      color: rgba(255,255,255,.24);
+    }
+
+    .hero p {
+      max-width: 610px;
+
+      margin: 30px auto 0;
+
+      color: rgba(255,255,255,.4);
+
+      font-size: 15px;
+
+      line-height: 1.75;
+    }
+
+
+    /* =========================================================
+       FOUNDER AREA
+    ========================================================= */
+
+    .founder {
+      display: grid;
+
+      grid-template-columns:
+        1.05fr
+        .95fr;
+
+      min-height: 670px;
+
+      border:
+        1px solid rgba(255,255,255,.08);
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255,255,255,.035),
+          rgba(255,255,255,.008)
+        );
+
+      overflow: hidden;
+
+      position: relative;
+    }
+
+
+    /* =========================================================
+       VISUAL SIDE
+    ========================================================= */
+
+    .founder-visual {
+      position: relative;
+
+      min-height: 670px;
+
+      overflow: hidden;
+
+      border-right:
+        1px solid rgba(255,255,255,.07);
+
+      background:
+        radial-gradient(
+          circle at 50% 50%,
+          rgba(0,229,255,.07),
+          transparent 38%
+        ),
+        #020202;
+    }
+
+
+    /* =========================================================
+       ORBIT
+    ========================================================= */
+
+    .orbit {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 480px;
+      height: 480px;
+
+      transform:
+        translate(-50%, -50%)
+        rotateX(65deg);
+
+      border:
+        1px solid rgba(0,229,255,.14);
+
+      border-radius: 50%;
+
+      animation:
+        orbit-spin
+        20s
+        linear
+        infinite;
+    }
+
+    .orbit:nth-child(2) {
+      width: 360px;
+      height: 360px;
+
+      border-color:
+        rgba(137,76,255,.16);
+
+      animation-duration: 15s;
+
+      animation-direction: reverse;
+    }
+
+    .orbit:nth-child(3) {
+      width: 600px;
+      height: 600px;
+
+      border-color:
+        rgba(255,255,255,.05);
+
+      animation-duration: 30s;
+    }
+
+    @keyframes orbit-spin {
+
+      from {
+        transform:
+          translate(-50%, -50%)
+          rotateX(65deg)
+          rotateZ(0deg);
+      }
+
+      to {
+        transform:
+          translate(-50%, -50%)
+          rotateX(65deg)
+          rotateZ(360deg);
+      }
+
+    }
+
+
+    /* =========================================================
+       ORBIT NODES
+    ========================================================= */
+
+    .node {
+      position: absolute;
+
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: #00e5ff;
+
+      box-shadow:
+        0 0 10px #00e5ff,
+        0 0 25px rgba(0,229,255,.7);
+    }
+
+    .node.one {
+      top: 12%;
+      left: 50%;
+    }
+
+    .node.two {
+      bottom: 15%;
+      left: 14%;
+
+      background: #8a5cff;
+
+      box-shadow:
+        0 0 10px #8a5cff,
+        0 0 25px rgba(138,92,255,.6);
+    }
+
+    .node.three {
+      right: 10%;
+      top: 47%;
+    }
+
+
+    /* =========================================================
+       CENTRAL CORE
+    ========================================================= */
+
+    .core {
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      width: 230px;
+      height: 230px;
+
+      transform:
+        translate(-50%, -50%);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(
+          circle at 35% 30%,
+          rgba(255,255,255,.10),
+          rgba(255,255,255,.025) 30%,
+          #030303 72%
+        );
+
+      border:
+        1px solid rgba(255,255,255,.13);
+
+      box-shadow:
+        0 0 0 12px rgba(255,255,255,.012),
+        0 0 80px rgba(0,229,255,.08),
+        inset 0 0 60px rgba(0,229,255,.025);
+
+      animation:
+        core-float
+        5s
+        ease-in-out
+        infinite;
+    }
+
+    @keyframes core-float {
+
+      0%, 100% {
+        transform:
+          translate(-50%, -50%)
+          scale(1);
+      }
+
+      50% {
+        transform:
+          translate(-50%, -53%)
+          scale(1.025);
+      }
+
+    }
+
+    .core::before {
+      content: "";
+
+      position: absolute;
+
+      inset: 18px;
+
+      border-radius: 50%;
+
+      border:
+        1px dashed rgba(0,229,255,.18);
+
+      animation:
+        spin
+        12s
+        linear
+        infinite;
+    }
+
+    @keyframes spin {
+
+      to {
+        transform: rotate(360deg);
+      }
+
+    }
+
+    .core-text {
+      position: relative;
+
+      text-align: center;
+
+      z-index: 2;
+    }
+
+    .core-text strong {
+      display: block;
+
+      font-size: 47px;
+
+      letter-spacing: -.08em;
+
+      font-weight: 600;
+    }
+
+    .core-text span {
+      display: block;
+
+      margin-top: 5px;
+
+      color: rgba(255,255,255,.32);
+
+      font-size: 9px;
+
+      letter-spacing: .22em;
+    }
+
+
+    /* =========================================================
+       PACKET LINES
+    ========================================================= */
+
+    .packet {
+      position: absolute;
+
+      width: 70px;
+      height: 1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          #00e5ff
+        );
+
+      opacity: .65;
+
+      filter:
+        drop-shadow(0 0 5px #00e5ff);
+
+      animation:
+        packet-flow
+        3s
+        linear
+        infinite;
+    }
+
+    .packet:nth-of-type(1) {
+      top: 32%;
+      left: -80px;
+    }
+
+    .packet:nth-of-type(2) {
+      top: 57%;
+      left: -120px;
+
+      animation-delay: 1s;
+    }
+
+    .packet:nth-of-type(3) {
+      top: 70%;
+      left: -100px;
+
+      animation-delay: 2s;
+    }
+
+    @keyframes packet-flow {
+
+      0% {
+        transform: translateX(0);
+        opacity: 0;
+      }
+
+      15% {
+        opacity: .7;
+      }
+
+      85% {
+        opacity: .7;
+      }
+
+      100% {
+        transform: translateX(850px);
+        opacity: 0;
+      }
+
+    }
+
+
+    /* =========================================================
+       SCANLINE
+    ========================================================= */
+
+    .scanline {
+      position: absolute;
+
+      left: 0;
+      right: 0;
+
+      height: 1px;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(0,229,255,.4),
+          transparent
+        );
+
+      box-shadow:
+        0 0 15px rgba(0,229,255,.25);
+
+      animation:
+        scan
+        7s
+        linear
+        infinite;
+    }
+
+    @keyframes scan {
+
+      from {
+        top: -2%;
+      }
+
+      to {
+        top: 102%;
+      }
+
+    }
+
+
+    /* =========================================================
+       PROFILE SIDE
+    ========================================================= */
+
+    .founder-content {
+      position: relative;
+
+      display: flex;
+
+      flex-direction: column;
+
+      justify-content: center;
+
+      padding: 65px;
+    }
+
+    .profile-kicker {
+      color: #00e5ff;
+
+      font-size: 10px;
+
+      font-weight: 600;
+
+      letter-spacing: .2em;
+
+      margin-bottom: 22px;
+    }
+
+    .founder-name {
+      font-size: clamp(
+        48px,
+        5vw,
+        74px
+      );
+
+      line-height: .9;
+
+      letter-spacing: -.075em;
+
+      font-weight: 600;
+    }
+
+    .founder-role {
+      margin-top: 15px;
+
+      color: rgba(255,255,255,.35);
+
+      font-size: 13px;
+
+      letter-spacing: .08em;
+
+      text-transform: uppercase;
+    }
+
+    .founder-line {
+      width: 100%;
+
+      height: 1px;
+
+      margin: 35px 0;
+
+      background:
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,.14),
+          transparent
+        );
+    }
+
+    .founder-bio {
+      max-width: 500px;
+
+      color: rgba(255,255,255,.48);
+
+      font-size: 15px;
+
+      line-height: 1.8;
+    }
+
+    .founder-bio strong {
+      color: rgba(255,255,255,.82);
+
+      font-weight: 500;
+    }
+
+
+    /* =========================================================
+       SYSTEM STATS
+    ========================================================= */
+
+    .stats {
+      display: grid;
+
+      grid-template-columns:
+        1fr
+        1fr;
+
+      margin-top: 45px;
+
+      border-top:
+        1px solid rgba(255,255,255,.07);
+
+      border-left:
+        1px solid rgba(255,255,255,.07);
+    }
+
+    .stat {
+      padding: 20px;
+
+      border-right:
+        1px solid rgba(255,255,255,.07);
+
+      border-bottom:
+        1px solid rgba(255,255,255,.07);
+    }
+
+    .stat-value {
+      display: block;
+
+      margin-bottom: 7px;
+
+      color: #fff;
+
+      font-size: 16px;
+
+      font-weight: 600;
+
+      letter-spacing: -.03em;
+    }
+
+    .stat-label {
+      color: rgba(255,255,255,.27);
+
+      font-size: 9px;
+
+      letter-spacing: .13em;
+    }
+
+
+    /* =========================================================
+       SOCIAL / CONTACT
+    ========================================================= */
+
+    .profile-links {
+      display: flex;
+
+      gap: 10px;
+
+      margin-top: 35px;
+    }
+
+    .profile-link {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 9px;
+
+      padding: 11px 14px;
+
+      border:
+        1px solid rgba(255,255,255,.09);
+
+      color: rgba(255,255,255,.45);
+
+      text-decoration: none;
+
+      font-size: 10px;
+
+      font-weight: 600;
+
+      letter-spacing: .06em;
+
+      transition:
+        color .25s ease,
+        border-color .25s ease,
+        background .25s ease;
+    }
+
+    .profile-link:hover {
+      color: #fff;
+
+      border-color:
+        rgba(0,229,255,.35);
+
+      background:
+        rgba(0,229,255,.04);
+    }
+
+
+    /* =========================================================
+       BOTTOM STATEMENT
+    ========================================================= */
+
+    .statement {
+      position: relative;
+
+      margin-top: 110px;
+
+      text-align: center;
+    }
+
+    .statement-line {
+      width: 1px;
+
+      height: 70px;
+
+      margin: 0 auto 35px;
+
+      background:
+        linear-gradient(
+          transparent,
+          rgba(0,229,255,.5),
+          transparent
+        );
+    }
+
+    .statement h2 {
+      font-size: clamp(
+        35px,
+        5vw,
+        65px
+      );
+
+      line-height: .95;
+
+      letter-spacing: -.065em;
+    }
+
+    .statement h2 span {
+      color: rgba(255,255,255,.23);
+    }
+
+    .statement p {
+      max-width: 530px;
+
+      margin: 25px auto 0;
+
+      color: rgba(255,255,255,.32);
+
+      font-size: 13px;
+
+      line-height: 1.7;
+    }
+
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+
+    footer {
+      position: relative;
+
+      z-index: 2;
+
+      width: min(1240px, calc(100% - 48px));
+
+      margin: auto;
+
+      padding: 30px 0 45px;
+
+      border-top:
+        1px solid rgba(255,255,255,.07);
+
+      display: flex;
+
+      justify-content: space-between;
+
+      color: rgba(255,255,255,.2);
+
+      font-size: 10px;
+
+      letter-spacing: .08em;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 900px) {
+
+      main {
+        padding-top: 80px;
+      }
+
+      .founder {
+        grid-template-columns: 1fr;
+      }
+
+      .founder-visual {
+        min-height: 540px;
+
+        border-right: none;
+
+        border-bottom:
+          1px solid rgba(255,255,255,.07);
+      }
+
+      .founder-content {
+        padding: 45px 35px 55px;
+      }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+      nav {
+        width: calc(100% - 32px);
+      }
+
+      .nav-label {
+        display: none;
+      }
+
+      main {
+        width: calc(100% - 32px);
+
+        padding-top: 70px;
+      }
+
+      .hero {
+        margin-bottom: 65px;
+      }
+
+      .hero h1 {
+        font-size: 64px;
+      }
+
+      .founder-visual {
+        min-height: 430px;
+      }
+
+      .orbit {
+        width: 330px;
+        height: 330px;
+      }
+
+      .orbit:nth-child(2) {
+        width: 250px;
+        height: 250px;
+      }
+
+      .orbit:nth-child(3) {
+        width: 410px;
+        height: 410px;
+      }
+
+      .core {
+        width: 175px;
+        height: 175px;
+      }
+
+      .core-text strong {
+        font-size: 37px;
+      }
+
+      .founder-content {
+        padding: 35px 25px 45px;
+      }
+
+      .founder-name {
+        font-size: 51px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        width: calc(100% - 32px);
+
+        flex-direction: column;
+
+        gap: 10px;
+      }
+
+    }
+
+
+    /* =========================================================
+       REDUCED MOTION
+    ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <div class="grid"></div>
+
+  <div class="cursor-glow"></div>
+
+
+  <!-- =======================================================
+       NAV
+  ======================================================== -->
+
+  <nav>
+
+    <a href="#" class="brand">
+
+      <span class="brand-dot"></span>
+
+      SafeSwitch Systems
+
+    </a>
+
+    <div class="nav-label">
+      TEAM / 001
+    </div>
+
+  </nav>
+
+
+  <!-- =======================================================
+       MAIN
+  ======================================================== -->
+
+  <main>
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+ 
+
+      <h1>
+        Small team.
+        <span>Serious infrastructure.</span>
+      </h1>
+
+      <p>
+        SafeSwitch is being built by engineers who believe critical
+        network infrastructure should fail over at the speed of
+        the systems actually carrying the traffic.
+      </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         FOUNDER
+    ====================================================== -->
+
+    <section class="founder">
+
+
+      <!-- VISUAL -->
+
+      <div class="founder-visual">
+
+        <div class="scanline"></div>
+
+        <div class="packet"></div>
+        <div class="packet"></div>
+        <div class="packet"></div>
+
+
+        <!-- ORBITS -->
+
+        <div class="orbit">
+
+          <span class="node one"></span>
+          <span class="node two"></span>
+          <span class="node three"></span>
+
+        </div>
+
+        <div class="orbit"></div>
+
+        <div class="orbit"></div>
+
+
+        <!-- CORE -->
+
+        <div class="core">
+
+          <div class="core-text">
+
+
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- CONTENT -->
+
+      <div class="founder-content">
+
+
+
+        <h2 class="founder-name">
+          Aliyev<br>
+          Islom
+        </h2>
+
+        <div class="founder-role">
+          Founder &amp; CEO
+        </div>
+
+        <div class="founder-line"></div>
+
+        <p class="founder-bio">
+
+          Building <strong>SafeSwitch Systems</strong> around a simple
+          idea: critical infrastructure should not have to wait for
+          a control plane to recover before traffic can move.
+
+          <br><br>
+
+          The focus is kernel-level networking, eBPF, XDP,
+          multi-region resilience, and infrastructure that can
+          make decisions at the edge of the system — where
+          milliseconds become availability.
+
+        </p>
+
+
+        <!-- STATS -->
+
+        <div class="stats">
+
+          <div class="stat">
+
+            <span class="stat-value">
+              eBPF / XDP
+            </span>
+
+            <span class="stat-label">
+              CORE TECHNOLOGY
+            </span>
+
+          </div>
+
+
+          <div class="stat">
+
+            <span class="stat-value">
+              Kernel-first
+            </span>
+
+            <span class="stat-label">
+              ARCHITECTURE
+            </span>
+
+          </div>
+
+
+          <div class="stat">
+
+            <span class="stat-value">
+              Global
+            </span>
+
+            <span class="stat-label">
+              INFRASTRUCTURE VISION
+            </span>
+
+          </div>
+
+
+          <div class="stat">
+
+            <span class="stat-value">
+              001
+            </span>
+
+            <span class="stat-label">
+              FOUNDING TEAM
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- LINKS -->
+
+        <div class="profile-links">
+
+          <a
+            href="#"
+            class="profile-link"
+          >
+            LINKEDIN
+            →
+          </a>
+
+          <a
+            href="#"
+            class="profile-link"
+          >
+            GITHUB
+            →
+          </a>
+
+          <a
+            href="mailto:hello@safeswitch.systems"
+            class="profile-link"
+          >
+            EMAIL
+            →
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         STATEMENT
+    ====================================================== -->
+
+    <section class="statement">
+
+      <div class="statement-line"></div>
+
+      <h2>
+        One mission.
+        <span>Zero excuses for downtime.</span>
+      </h2>
+
+      <p>
+        We're starting small by design. Every layer of SafeSwitch
+        is being built with the same principle: remove unnecessary
+        dependencies between a failure and the system's ability
+        to respond to it.
+      </p>
+
+    </section>
+
+
+  </main>
+
+
+  <!-- =======================================================
+       FOOTER
+  ======================================================== -->
+
+  <footer>
+
+    <span>
+      SAFESWITCH SYSTEMS
+    </span>
+
+    <span>
+      KERNEL-SPEED INFRASTRUCTURE
+    </span>
+
+    <span>
+      © 2026
+    </span>
+
+  </footer>
+
+
+  <!-- =======================================================
+       JAVASCRIPT
+  ======================================================== -->
+
+  <script>
+
+    /* =========================================================
+       CURSOR GLOW
+    ========================================================= */
+
+    const glow =
+      document.querySelector(".cursor-glow");
+
+    document.addEventListener(
+      "mousemove",
+      (event) => {
+
+        glow.style.left =
+          event.clientX + "px";
+
+        glow.style.top =
+          event.clientY + "px";
+
+      }
+    );
+
+
+    /* =========================================================
+       MAGNETIC FOUNDER PANEL
+    ========================================================= */
+
+    const founder =
+      document.querySelector(".founder");
+
+    founder.addEventListener(
+      "mousemove",
+      (event) => {
+
+        const rect =
+          founder.getBoundingClientRect();
+
+        const x =
+          event.clientX - rect.left;
+
+        const y =
+          event.clientY - rect.top;
+
+        const rotateY =
+          ((x / rect.width) - .5) * 2;
+
+        const rotateX =
+          ((y / rect.height) - .5) * -2;
+
+        founder.style.transform =
+          `
+          perspective(1800px)
+          rotateX(${rotateX}deg)
+          rotateY(${rotateY}deg)
+          `;
+      }
+    );
+
+
+    founder.addEventListener(
+      "mouseleave",
+      () => {
+
+        founder.style.transform =
+          `
+          perspective(1800px)
+          rotateX(0deg)
+          rotateY(0deg)
+          `;
+
+      }
+    );
+
+
+    /* =========================================================
+       SCROLL REVEAL
+    ========================================================= */
+
+    const revealItems =
+      document.querySelectorAll(
+        ".founder, .statement"
+      );
+
+    const observer =
+      new IntersectionObserver(
+        (entries) => {
+
+          entries.forEach(entry => {
+
+            if (entry.isIntersecting) {
+
+              entry.target.style.opacity = "1";
+
+              entry.target.style.transform =
+                "translateY(0)";
+
+            }
+
+          });
+
+        },
+        {
+          threshold: .15
+        }
+      );
+
+
+    revealItems.forEach(item => {
+
+      item.style.opacity = "0";
+
+      item.style.transform =
+        "translateY(35px)";
+
+      item.style.transition =
+        "opacity 1s ease, transform 1s cubic-bezier(.16,1,.3,1)";
+
+      observer.observe(item);
+
+    });
+
+
+  </script>
+
+</body>
+</html>
