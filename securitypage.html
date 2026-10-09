@@ -2019,6 +2019,41 @@
       transform:
         translateY(-2px);
     }
+    .crypto-visual {
+  position: relative;
+  height: 570px;
+  border: 1px solid rgba(255,255,255,.08);
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.35),
+      rgba(0,0,0,.72)
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.35),
+      transparent 50%,
+      rgba(0,0,0,.25)
+    ),
+    url("./assets/pics/images\ \(3\).jfif")
+      center / cover no-repeat;
+}
+
+/* Keep the existing animation above the image */
+.lattice,
+.crypto-core {
+  z-index: 2;
+}
+
+.crypto-core {
+  position: absolute;
+}
+
+.lattice {
+  pointer-events: none;
+}
 
 
     /* =========================================================
@@ -2663,62 +2698,7 @@
         </div>
 
 
-        <div class="packet-interface">
 
-          <div class="packet-title">
-            LIVE PACKET PATH / SIMULATION
-          </div>
-
-          <div class="connection"></div>
-
-          <div class="network-node node-internet">
-            INTERNET
-            <small>INGRESS</small>
-          </div>
-
-          <div class="network-node node-nic">
-            NIC
-            <small>RECEIVE</small>
-          </div>
-
-          <div class="network-node node-xdp">
-            XDP
-            <small>DECIDE</small>
-          </div>
-
-          <div class="network-node node-kernel">
-            KERNEL
-            <small>PROCESS</small>
-          </div>
-
-          <div class="network-node node-app">
-            APP
-            <small>SERVE</small>
-          </div>
-
-
-          <div class="packet"></div>
-          <div class="packet" style="animation-delay:.8s"></div>
-          <div class="packet" style="animation-delay:1.6s"></div>
-
-          <div
-            class="packet red"
-            style="animation-delay:.3s"
-          ></div>
-
-          <div
-            class="packet red"
-            style="animation-delay:1.2s"
-          ></div>
-
-          <div
-            class="packet red"
-            style="animation-delay:2.1s"
-          ></div>
-
-          <div class="drop-zone"></div>
-
-        </div>
 
       </div>
 
@@ -2731,67 +2711,10 @@
 
     <section class="section reveal">
 
-      <div class="metrics">
-
-        <div class="metric">
-
-          <span
-            class="metric-value cyan"
-            data-count="170"
-          >
-            0
-          </span>
-
-          <span class="metric-label">
-            EXAMPLE PPS / SIMULATION
-          </span>
-
-        </div>
+ 
 
 
-        <div class="metric">
 
-          <span
-            class="metric-value green"
-            data-count="2"
-          >
-            0
-          </span>
-
-          <span class="metric-label">
-            EXAMPLE CPU / SIMULATION
-          </span>
-
-        </div>
-
-
-        <div class="metric">
-
-          <span
-            class="metric-value purple"
-            data-count="100"
-          >
-            0
-          </span>
-
-          <span class="metric-label">
-            SIGNED RELEASES / TARGET
-          </span>
-
-        </div>
-
-
-        <div class="metric">
-
-          <span class="metric-value">
-            XDP
-          </span>
-
-          <span class="metric-label">
-            PROCESSING LAYER
-          </span>
-
-        </div>
 
       </div>
 

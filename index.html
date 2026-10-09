@@ -232,21 +232,60 @@
        HERO
     ========================================================= */
 
-    .hero {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 150px 0 70px;
-    }
+.hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
 
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-    }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  padding: 150px 0 70px;
+  overflow: hidden;
+
+  background: #000;
+}
+
+/* VIDEO BACKGROUND */
+.hero-video {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center;
+
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* DARK OVERLAY */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(0, 0, 0, 0.60) 45%,
+    rgba(0, 0, 0, 0.92) 85%,
+    #000 100%
+  );
+
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* HERO CONTENT */
+.hero-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
 
     .eyebrow {
       display: inline-flex;
@@ -382,7 +421,21 @@
     /* =========================================================
        NETWORK VISUALIZATION
     ========================================================= */
+    .ss-enterprise-marquee{
+  background-image:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.45) 0%,
+      rgba(0, 0, 0, 0.60) 45%,
+      #000 100%
+    ),
+    url("./assets/pics/images.jfif");
 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+    }
     .network {
       position: relative;
       width: min(1000px, 100%);
@@ -1863,7 +1916,7 @@
     <div class="nav-links">
       <a href="#problem">Problem</a>
       <a href="#architecture">Architecture</a>
-      <a href="#performance">Performance</a>
+      <a href="./PQC.html">PQC/Quantum Computing</a>
       <a href="#terminal">CLI</a>
     </div>
 
@@ -1884,57 +1937,63 @@
 
   <main>
 
-    <section class="hero">
+<section class="hero">
 
-      <div class="container hero-content">
+  <!-- Background video -->
+  <video
+    class="hero-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    webkit-playsinline
+    preload="auto"
+    poster="./assets/pics/gemEHAFrwkh09_jfKzTEZ0hbFzXYDixBNUDEPQKigXHpZfOHNsLfZ0sVu2ec1IhiGMov_cDATir9YlwNguInDpOt5FoOuInS3uk83GbUKhyYuvKbQ2JjotMWQxrtB3EIDpCvKyEh0nd0lVrZMUswACnTLV2sFHh5jEUUjS88ELmwhD6Mlu_x8dLX3wrQxJ03.jfif"
+    aria-hidden="true"
+  >
+    <source
+      src="./assets/13820343_3840_2160_30fps.mp4"
+      type="video/mp4"
+    >
+  </video>
 
+  <!-- Dark overlay -->
+  <div class="hero-overlay"></div>
 
+  <!-- Foreground content -->
+  <div class="container hero-content">
 
-        <h1>
-          Multi-Region
-          <br />
-          <span>Failover at Kernel Speed.</span>
-        </h1>
+    <div class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      KERNEL-NATIVE INFRASTRUCTURE
+    </div>
 
-        <p class="hero-description">
-          Zero API keys. Zero control-plane dependencies.
-          SafeSwitch operates inside the Linux kernel using eBPF and XDP
-          to route traffic in milliseconds — before your network stack
-          even realizes there is a crisis.
-        </p>
+    <h1>
+      Multi-Region
+      <br>
+      <span>Failover at Kernel Speed.</span>
+    </h1>
 
-        <div class="hero-buttons">
+    <p class="hero-description">
+      Zero API keys. Zero control-plane dependencies.
+      SafeSwitch operates inside the Linux kernel using eBPF and XDP
+      to route traffic in milliseconds — before your network stack
+      even realizes there is a crisis.
+    </p>
 
-          <a href="#terminal" class="btn btn-primary">
-            Deploy to Kernel →
-          </a>
+    <div class="hero-buttons">
+      <a href="#terminal" class="btn btn-primary">
+        Deploy to Kernel →
+      </a>
 
-          <a href="#architecture" class="btn btn-secondary">
-            Read Whitepaper
-          </a>
+      <a href="#architecture" class="btn btn-secondary">
+        Read Whitepaper
+      </a>
+    </div>
 
-        </div>
+  </div>
 
-
-        <!-- NETWORK VISUALIZATION -->
-
-        <div class="network" id="network">
-
-          <div class="nic">
-
-            <div class="nic-chip"></div>
-
-
-
-          </div>
-
-
-
-        </div>
-
-      </div>
-
-    </section>
+</section>
 
 
     <!-- =====================================================
@@ -2068,7 +2127,20 @@
 
   padding: 150px 0 160px;
 
-  background: #000;
+  /* Separate background image for this section */
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.45) 0%,
+      rgba(0, 0, 0, 0.65) 50%,
+      rgba(0, 0, 0, 0.90) 100%
+    ),
+    url("./assets/pics/data-storage-cube-between-neon-pathways-quantum-computing-database-cloud-computing-concept-photo.webp");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
   color: #fff;
 
   font-family:
@@ -2350,6 +2422,84 @@
   filter: blur(45px);
 
   pointer-events: none;
+}
+/* Background for the DNS problem section */
+#problem {
+  position: relative;
+  isolation: isolate;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.72) 50%,
+      rgba(0, 0, 0, 0.92) 100%
+    ),
+    url("./assets/pics/BUUe5HrerhErvPcHhPhztd6IYX7FhdUZZo-v6Oz40VDBFxEZQQzOOj1xIWB701NDe5Dxi5oObH2w89AM18x6F8-SnYO0JBiW5DK0RVkSm6x185VPJrvb189bqisbm1k_wcdhaorMTy6_W5J__v7hFfuQSR1bYMXMm29quIXKWZcB62Hr3uRiB_tSIncUlC6i.jfif");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Keep the content above the background */
+#problem > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Background for the Breakthrough section */
+.breakthrough {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.68) 45%,
+      rgba(0, 0, 0, 0.92) 100%
+    ),
+    url("./assets/pics/images\ \(2\).jfif");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Keep all content above the background */
+.breakthrough > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Architecture section background */
+#architecture {
+  position: relative;
+  isolation: isolate;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.65) 0%,
+      rgba(0, 0, 0, 0.78) 45%,
+      rgba(0, 0, 0, 0.94) 100%
+    ),
+    url("./assets/pics/ss.jfif");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Keep the architecture content above the image */
+#architecture > .container {
+  position: relative;
+  z-index: 1;
 }
 
 
@@ -3253,29 +3403,6 @@
        PACKET GENERATOR
     ========================================================= */
 
-    const network = document.getElementById("network");
-
-    for (let i = 0; i < 22; i++) {
-
-      const packet = document.createElement("div");
-
-      packet.className = "packet";
-
-      packet.style.top =
-        (10 + Math.random() * 80) + "%";
-
-      packet.style.left =
-        (-20 + Math.random() * 30) + "%";
-
-      packet.style.animationDuration =
-        (1.2 + Math.random() * 1.7) + "s";
-
-      packet.style.animationDelay =
-        (Math.random() * 2) + "s";
-
-      network.appendChild(packet);
-
-    }
 
 
     /* =========================================================

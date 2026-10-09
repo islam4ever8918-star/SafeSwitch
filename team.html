@@ -187,6 +187,49 @@
         ease-in-out
         infinite;
     }
+    body {
+  background: #000;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Background photograph */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.60),
+      rgba(0, 0, 0, 0.86) 55%,
+      #000 100%
+    ),
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.45),
+      rgba(0, 0, 0, 0.30)
+    ),
+    url("./assets/pics/6yn9sN9Gq7FeltyH9wfevKx-GqvfNCnSELCRVrDtvkFCEir-iNOewbKu-oHTFyHX-eWp7rSdm1qIiT0tJ82oXaQ_Z3oH5APCsEFOQ2qRSZedbcrQUoAMlgOh6y2hP_3gLisuYhYZWGruW3VR4G0AbNZvnDg32cbvS7pcQ4V7U0R4On88CmfffVmVwC2p9bqD.jfif");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Keep the existing grid subtle */
+.grid {
+  opacity: 0.12;
+}
+
+/* Preserve the founder panel's readable contrast */
+.founder {
+  background: rgba(3, 3, 3, 0.72);
+  backdrop-filter: blur(8px);
+}
 
     @keyframes pulse-dot {
 
@@ -1116,9 +1159,9 @@
 
   <nav>
 
-    <a href="#" class="brand">
+    <a href="./index.html" class="brand">
 
-      <span class="brand-dot"></span>
+
 
       SafeSwitch Systems
 
@@ -1178,33 +1221,7 @@
 
         <!-- ORBITS -->
 
-        <div class="orbit">
-
-          <span class="node one"></span>
-          <span class="node two"></span>
-          <span class="node three"></span>
-
-        </div>
-
-        <div class="orbit"></div>
-
-        <div class="orbit"></div>
-
-
-        <!-- CORE -->
-
-        <div class="core">
-
-          <div class="core-text">
-
-
-
-          </div>
-
-        </div>
-
-      </div>
-
+       
 
       <!-- CONTENT -->
 

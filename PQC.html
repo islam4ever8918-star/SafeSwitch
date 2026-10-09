@@ -1,0 +1,3201 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Quantum Era — Post-Quantum Cryptography</title>
+
+<meta name="description" content="A visual and technical introduction to quantum computing, cryptography, quantum threats, and post-quantum security."
+
+<style> margin: 0; padding: 0; box-sizing: border-box; 
+
+html { scroll-behavior: smooth; }
+
+body { background: #05070b; color: #f5f7fb; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.7; overflow-x: hidden; color-scheme: dark; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+img { display: block; max-width: 100%; }
+
+a { color: inherit; text-decoration: none; }
+
+button, input, textarea { font: inherit; }
+
+::selection { background: #5de1ff; color: #031018; }
+
+section[id] { scroll-margin-top: 96px; }
+
+/* ========================================================= VARIABLES ========================================================= */
+
+:root { --background: #05070b; --background-2: #080c13; --background-3: #0c111a;
+
+--surface: #0c1119; --surface-2: #101722;
+
+--border: rgba(255, 255, 255, 0.09); --border-light: rgba(255, 255, 255, 0.14);
+
+--white: #f7f9fc; --text: #dce2eb; --muted: #919bad; --dim: #606a7c;
+
+--cyan: #5de1ff; --cyan-dark: #1596b5;
+
+--purple: #9b7cff; --purple-light: #c0adff;
+
+--green: #55e6a5; --yellow: #ffd166; --red: #ff6b81;
+
+--max-width: 1180px;
+
+--radius-small: 12px; --radius: 20px; --radius-large: 30px;
+
+--shadow: 0 25px 80px rgba(0, 0, 0, 0.35); }
+
+/* ========================================================= GLOBAL LAYOUT ========================================================= */
+
+.container { width: min(var(--max-width), calc(100% - 40px)); margin: 0 auto; }
+
+.section { padding: 120px 0; position: relative; }
+
+.section-header { max-width: 820px; margin-bottom: 55px; }
+
+.section-label { display: inline-block; margin-bottom: 16px;
+
+color: var(--cyan);
+
+font-family: monospace; font-size: 12px; font-weight: 700;
+
+letter-spacing: 0.12em; text-transform: uppercase; }
+
+.section-title { color: var(--white);
+
+font-size: clamp(38px, 5vw, 68px); line-height: 1.04; letter-spacing: -0.045em;
+
+margin-bottom: 22px;
+
+text-wrap: balance; }
+
+.section-description { color: var(--muted); font-size: 18px; max-width: 760px; }
+
+.text-cyan { color: var(--cyan); }
+
+.text-purple { color: var(--purple-light); }
+
+.text-green { color: var(--green); }
+
+.text-yellow { color: var(--yellow); }
+
+/* ========================================================= BACKGROUND EFFECTS ========================================================= */
+
+.background-glow { position: fixed; pointer-events: none; z-index: -1;
+
+width: 700px; height: 700px;
+
+border-radius: 50%;
+
+filter: blur(100px); opacity: 0.08; }
+
+.glow-one { top: -300px; left: -250px; background: var(--cyan); }
+
+.glow-two { top: 35%; right: -300px; background: var(--purple); }
+
+.glow-three { bottom: -350px; left: 25%; background: var(--green); }
+
+/* ========================================================= NAVIGATION ========================================================= */
+
+.navbar { position: fixed; top: 0; left: 0; width: 100%;
+
+height: 72px;
+
+z-index: 100;
+
+background: rgba(5, 7, 11, 0.88); border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+
+backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+
+.nav-inner { height: 100%;
+
+width: min(var(--max-width), calc(100% - 40px)); margin: 0 auto;
+
+display: flex; align-items: center; justify-content: space-between; }
+
+.brand { display: flex; align-items: center; gap: 11px;
+
+font-weight: 800; font-size: 14px; letter-spacing: 0.05em; }
+
+.brand-symbol { width: 34px; height: 34px;
+
+border-radius: 10px;
+
+background: linear-gradient( 135deg, var(--cyan), var(--purple) );
+
+position: relative;
+
+box-shadow: 0 0 25px rgba(93, 225, 255, 0.15); }
+
+.brand-symbol::before, .brand-symbol::after { content: "";
+
+position: absolute;
+
+border: 1px solid rgba(255, 255, 255, 0.85);
+
+border-radius: 50%; }
+
+.brand-symbol::before { width: 18px; height: 8px;
+
+top: 12px; left: 8px;
+
+transform: rotate(30deg); }
+
+.brand-symbol::after { width: 8px; height: 18px;
+
+top: 8px; left: 12px;
+
+transform: rotate(30deg); }
+
+.nav-links { display: flex; align-items: center; gap: 25px;
+
+color: var(--muted);
+
+font-size: 13px; }
+
+.nav-links a { transition: color 0.2s ease; }
+
+.nav-links a:hover { color: var(--white); }
+
+.nav-cta { padding: 9px 14px;
+
+border: 1px solid var(--border-light); border-radius: 999px;
+
+font-size: 12px; font-weight: 700;
+
+background: rgba(255, 255, 255, 0.04);
+
+transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease; }
+
+.nav-cta:hover { transform: translateY(-1px); border-color: rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.07); }
+
+/* ========================================================= HERO ========================================================= */
+
+.hero { min-height: 100vh;
+
+padding-top: 160px; padding-bottom: 100px;
+
+display: flex; align-items: center; }
+
+.hero-content { max-width: 950px; }
+
+.hero-badge { display: inline-flex; align-items: center; gap: 9px;
+
+padding: 7px 12px;
+
+border: 1px solid rgba(93, 225, 255, 0.22); border-radius: 999px;
+
+color: var(--cyan);
+
+background: rgba(93, 225, 255, 0.05);
+
+font-size: 11px; font-weight: 700;
+
+letter-spacing: 0.1em; text-transform: uppercase;
+
+margin-bottom: 28px; }
+
+.hero-dot { width: 6px; height: 6px;
+
+border-radius: 50%;
+
+background: var(--cyan);
+
+box-shadow: 0 0 14px var(--cyan); }
+
+.hero-title { font-size: clamp(54px, 8vw, 104px);
+
+line-height: 0.94; letter-spacing: -0.065em;
+
+max-width: 1000px;
+
+margin-bottom: 30px; }
+
+.gradient-text { background: linear-gradient( 100deg, #ffffff 0%, #aeefff 30%, #a394ff 75%, #e0b2ff 100% );
+
+-webkit-background-clip: text; background-clip: text;
+
+color: transparent; }
+
+.hero-description { max-width: 770px;
+
+color: var(--muted);
+
+font-size: 20px; line-height: 1.7;
+
+margin-bottom: 35px; }
+
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.button { display: inline-flex; align-items: center; justify-content: center;
+
+min-height: 46px;
+
+padding: 0 18px;
+
+border-radius: 12px;
+
+font-size: 13px; font-weight: 750;
+
+border: 1px solid var(--border-light);
+
+background: rgba(255, 255, 255, 0.04);
+
+transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease; }
+
+.button:hover { transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.22); background: rgba(255, 255, 255, 0.07); }
+
+.button-primary { color: #041017;
+
+border: none;
+
+background: linear-gradient( 135deg, var(--cyan), #8fa8ff ); }
+
+.button-primary:hover { background: linear-gradient( 135deg, #7be8ff, #a9baff ); }
+
+/* ========================================================= IMAGE PLACEHOLDER ========================================================= */
+
+.image-area { width: 100%; min-height: 420px;
+
+border: 1px dashed rgba(255, 255, 255, 0.18); border-radius: var(--radius-large);
+
+background: linear-gradient( 145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015) );
+
+display: flex; align-items: center; justify-content: center;
+
+position: relative; overflow: hidden;
+
+margin-top: 70px; }
+
+.image-area::before { content: "";
+
+position: absolute;
+
+width: 500px; height: 500px;
+
+border-radius: 50%;
+
+background: radial-gradient( circle, rgba(93, 225, 255, 0.08), transparent 65% ); }
+
+.image-placeholder-content { position: relative; z-index: 1;
+
+max-width: 500px;
+
+padding: 30px;
+
+text-align: center; }
+
+.image-icon { width: 62px; height: 62px;
+
+margin: 0 auto 18px;
+
+border-radius: 17px;
+
+display: flex; align-items: center; justify-content: center;
+
+color: var(--cyan);
+
+border: 1px solid rgba(93, 225, 255, 0.18); background: rgba(93, 225, 255, 0.05);
+
+font-size: 25px; }
+
+.image-title { color: var(--white);
+
+font-size: 14px; font-weight: 750;
+
+margin-bottom: 6px; }
+
+.image-description { color: var(--dim);
+
+font-size: 12px; line-height: 1.6; }
+
+/* ========================================================= CARDS ========================================================= */
+
+.grid { display: grid; gap: 18px; }
+
+.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.card { padding: 30px;
+
+border: 1px solid var(--border); border-radius: var(--radius);
+
+background: linear-gradient( 145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015) );
+
+transition: border-color 0.2s ease, transform 0.2s ease; }
+
+.card:hover { transform: translateY(-3px); border-color: rgba(255, 255, 255, 0.15); }
+
+.card-label { color: var(--cyan);
+
+font-family: monospace; font-size: 11px; font-weight: 700;
+
+letter-spacing: 0.08em;
+
+margin-bottom: 18px; }
+
+.card-icon { width: 46px; height: 46px;
+
+border-radius: 13px;
+
+display: flex; align-items: center; justify-content: center;
+
+margin-bottom: 20px;
+
+color: var(--cyan);
+
+border: 1px solid rgba(93, 225, 255, 0.14); background: rgba(93, 225, 255, 0.06); }
+
+.card-title { color: var(--white);
+
+font-size: 23px; line-height: 1.2;
+
+margin-bottom: 12px; }
+
+.card p { color: var(--muted); font-size: 15px; }
+
+.card p + p { margin-top: 14px; }
+
+/* ========================================================= QUANTUM BOX ========================================================= */
+
+.quantum-box { padding: 35px;
+
+border-radius: var(--radius);
+
+border: 1px solid rgba(155, 124, 255, 0.17);
+
+background: radial-gradient( circle at 90% 10%, rgba(155, 124, 255, 0.11), transparent 35% ), #0a0e16; }
+
+.equation { margin: 22px 0;
+
+padding: 18px 20px;
+
+border-radius: 12px;
+
+background: #030509;
+
+border: 1px solid rgba(255, 255, 255, 0.07);
+
+color: #d9e4f5;
+
+font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+font-size: 14px;
+
+overflow-x: auto; white-space: nowrap; }
+
+/* ========================================================= CALLOUT ========================================================= */
+
+.callout { padding: 27px 30px;
+
+border-left: 3px solid var(--cyan);
+
+border-radius: 0 16px 16px 0;
+
+background: linear-gradient( 90deg, rgba(93, 225, 255, 0.07), rgba(93, 225, 255, 0.015) ); }
+
+.callout strong { display: block;
+
+color: var(--white);
+
+margin-bottom: 7px; }
+
+.callout p { color: var(--muted); }
+
+/* ========================================================= COMPARISON TABLE ========================================================= */
+
+.table-wrapper { width: 100%;
+
+overflow-x: auto;
+
+border: 1px solid var(--border); border-radius: var(--radius); }
+
+table { width: 100%; min-width: 750px;
+
+border-collapse: collapse; }
+
+th, td { padding: 18px 20px;
+
+text-align: left;
+
+border-bottom: 1px solid var(--border); }
+
+th { color: var(--white);
+
+background: rgba(255, 255, 255, 0.04);
+
+font-size: 11px;
+
+text-transform: uppercase; letter-spacing: 0.08em; }
+
+td { color: var(--muted);
+
+font-size: 14px; }
+
+tr:last-child td { border-bottom: none; }
+
+/* ========================================================= FLOW ========================================================= */
+
+.flow { display: grid;
+
+grid-template-columns: repeat(5, minmax(0, 1fr));
+
+gap: 14px; }
+
+.flow-card { position: relative;
+
+min-height: 190px;
+
+padding: 24px;
+
+border: 1px solid var(--border); border-radius: 18px;
+
+background: rgba(255, 255, 255, 0.025); }
+
+.flow-number { color: var(--cyan);
+
+font-family: monospace; font-size: 11px;
+
+margin-bottom: 20px; }
+
+.flow-title { color: var(--white);
+
+font-size: 18px;
+
+margin-bottom: 9px; }
+
+.flow-card p { color: var(--muted);
+
+font-size: 13px; line-height: 1.6; }
+
+.flow-card:not(:last-child)::after { content: "→";
+
+position: absolute;
+
+right: -17px; top: 50%;
+
+transform: translateY(-50%);
+
+color: var(--cyan);
+
+font-size: 19px;
+
+z-index: 5; }
+
+/* ========================================================= TIMELINE ========================================================= */
+
+.timeline { position: relative;
+
+max-width: 900px; }
+
+.timeline::before { content: "";
+
+position: absolute;
+
+left: 8px; top: 5px; bottom: 5px;
+
+width: 1px;
+
+background: linear-gradient( to bottom, var(--cyan), rgba(93, 225, 255, 0.04) ); }
+
+.timeline-item { position: relative;
+
+padding-left: 45px;
+
+margin-bottom: 45px; }
+
+.timeline-item:last-child { margin-bottom: 0; }
+
+.timeline-dot { position: absolute;
+
+left: 0; top: 7px;
+
+width: 17px; height: 17px;
+
+border-radius: 50%;
+
+background: var(--background);
+
+border: 2px solid var(--cyan);
+
+box-shadow: 0 0 16px rgba(93, 225, 255, 0.3); }
+
+.timeline-label { color: var(--cyan);
+
+font-family: monospace; font-size: 11px;
+
+margin-bottom: 7px; }
+
+.timeline-title { color: var(--white);
+
+font-size: 22px;
+
+margin-bottom: 7px; }
+
+.timeline-text { color: var(--muted);
+
+max-width: 720px; }
+
+/* ========================================================= ARCHITECTURE ========================================================= */
+
+.architecture { display: grid;
+
+grid-template-columns: 1fr 1.4fr 1fr;
+
+gap: 18px;
+
+align-items: center; }
+
+.architecture-column { display: grid; gap: 14px; }
+
+.architecture-node { padding: 20px;
+
+border: 1px solid var(--border); border-radius: 16px;
+
+background: rgba(255, 255, 255, 0.035);
+
+text-align: center; }
+
+.architecture-node strong { display: block;
+
+color: var(--white);
+
+font-size: 15px;
+
+margin-bottom: 4px; }
+
+.architecture-node span { color: var(--muted);
+
+font-size: 12px; }
+
+.architecture-center { min-height: 350px;
+
+display: flex; align-items: center; justify-content: center;
+
+text-align: center;
+
+padding: 30px;
+
+border-radius: 28px;
+
+border: 1px solid rgba(93, 225, 255, 0.22);
+
+background: radial-gradient( circle, rgba(93, 225, 255, 0.1), transparent 65% ), #090e16; }
+
+.architecture-center-title { color: var(--white);
+
+font-size: 32px; font-weight: 800;
+
+letter-spacing: -0.04em;
+
+margin-bottom: 10px; }
+
+.architecture-center p { color: var(--muted);
+
+font-size: 13px; }
+
+/* ========================================================= STATS ========================================================= */
+
+.stats { display: grid;
+
+grid-template-columns: repeat(4, minmax(0, 1fr));
+
+gap: 15px; }
+
+.stat { padding: 27px;
+
+border: 1px solid var(--border); border-radius: 18px;
+
+background: rgba(255, 255, 255, 0.025); }
+
+.stat-number { color: var(--white);
+
+font-size: 38px; line-height: 1;
+
+font-weight: 800;
+
+letter-spacing: -0.05em;
+
+margin-bottom: 10px; }
+
+.stat-text { color: var(--muted);
+
+font-size: 13px; }
+
+/* ========================================================= CODE BLOCK ========================================================= */
+
+.code-block { overflow: hidden;
+
+border: 1px solid var(--border); border-radius: 18px;
+
+background: #030509; }
+
+.code-header { height: 44px;
+
+display: flex; align-items: center; gap: 7px;
+
+padding: 0 15px;
+
+border-bottom: 1px solid var(--border);
+
+color: var(--dim);
+
+font-family: monospace; font-size: 11px; }
+
+.window-dot { width: 8px; height: 8px;
+
+border-radius: 50%; }
+
+.red { background: #ff605c; }
+
+.yellow { background: #ffbd44; }
+
+.green { background: #00ca4e; }
+
+pre { padding: 25px;
+
+overflow-x: auto;
+
+color: #cad5e5;
+
+font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+font-size: 13px;
+
+line-height: 1.8; }
+
+.comment { color: #536077; }
+
+.keyword { color: #d49aff; }
+
+.function { color: #67e4ff; }
+
+.string { color: #77e7a5; }
+
+/* ========================================================= FAQ ========================================================= */
+
+.faq { max-width: 900px; }
+
+.faq-item { border: 1px solid var(--border);
+
+border-radius: 15px;
+
+background: rgba(255, 255, 255, 0.025);
+
+margin-bottom: 10px;
+
+overflow: hidden; }
+
+.faq-item summary { padding: 20px 22px;
+
+cursor: pointer;
+
+color: var(--white);
+
+font-weight: 700;
+
+list-style: none;
+
+position: relative;
+
+padding-right: 50px; }
+
+.faq-item summary::-webkit-details-marker { display: none; }
+
+.faq-item summary::after { content: "+";
+
+position: absolute;
+
+right: 20px; top: 50%;
+
+transform: translateY(-50%);
+
+color: var(--cyan);
+
+font-size: 20px;
+
+font-weight: 400; }
+
+.faq-item[open] summary::after { content: "−"; }
+
+.faq-answer { padding: 0 22px 22px;
+
+color: var(--muted);
+
+font-size: 14px; }
+
+/* ========================================================= FINAL CTA ========================================================= */
+
+.final-box { padding: 65px;
+
+border-radius: 30px;
+
+border: 1px solid rgba(93, 225, 255, 0.18);
+
+background: radial-gradient( circle at 80% 20%, rgba(155, 124, 255, 0.11), transparent 35% ), radial-gradient( circle at 20% 80%, rgba(93, 225, 255, 0.08), transparent 35% ), #090d14; }
+
+.final-title { max-width: 800px;
+
+color: var(--white);
+
+font-size: clamp(38px, 5vw, 66px);
+
+line-height: 1;
+
+letter-spacing: -0.05em;
+
+margin-bottom: 22px; }
+
+.final-text { max-width: 760px;
+
+color: var(--muted);
+
+font-size: 17px; }
+
+/* ========================================================= FOOTER ========================================================= */
+
+footer { padding: 70px 0;
+
+border-top: 1px solid var(--border); }
+
+.footer-grid { display: grid;
+
+grid-template-columns: 1.5fr 1fr 1fr;
+
+gap: 40px; }
+
+.footer-brand { color: var(--white);
+
+font-weight: 800;
+
+margin-bottom: 10px; }
+
+.footer-text { color: var(--dim);
+
+font-size: 13px;
+
+max-width: 480px; }
+
+.footer-heading { color: var(--white);
+
+font-size: 13px; font-weight: 700;
+
+margin-bottom: 10px; }
+
+.footer-list { list-style: none;
+
+color: var(--dim);
+
+font-size: 13px; }
+
+.footer-list li { margin-bottom: 5px; }
+
+.footer-bottom { margin-top: 50px;
+
+padding-top: 20px;
+
+border-top: 1px solid var(--border);
+
+color: #4f5969;
+
+font-size: 11px; }
+
+/* ========================================================= RESPONSIVE ========================================================= */
+
+@media (max-width: 1000px) {
+
+.nav-links { display: none; }
+
+.grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.flow-card:not(:last-child)::after { display: none; }
+
+.stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.architecture { grid-template-columns: 1fr; }
+
+.architecture-center { min-height: 260px; } }
+
+@media (max-width: 700px) {
+
+.container { width: min( var(--max-width), calc(100% - 28px) ); }
+
+.section { padding: 80px 0; }
+
+.hero { padding-top: 125px; padding-bottom: 70px; }
+
+.hero-title { font-size: 54px; }
+
+.hero-description { font-size: 17px; }
+
+.section-title { font-size: 40px; }
+
+.section-description { font-size: 16px; }
+
+.grid-2, .grid-3, .flow, .stats { grid-template-columns: 1fr; }
+
+.card { padding: 24px; }
+
+.quantum-box { padding: 25px; }
+
+.image-area { min-height: 280px; margin-top: 50px; }
+
+.final-box { padding: 35px 25px; }
+
+.footer-grid { grid-template-columns: 1fr; } }
+
+@media (max-width: 450px) {
+
+.nav-cta { display: none; }
+
+.hero-title { font-size: 47px; }
+
+.hero-actions { flex-direction: column; }
+
+.button { width: 100%; }
+
+.image-area { min-height: 240px; } } </style> </head>
+
+<body>
+
+<!-- ======================================================= BACKGROUND ======================================================== -->
+
+<div class="background-glow glow-one"></div> <div class="background-glow glow-two"></div> <div class="background-glow glow-three"></div>
+
+<!-- ======================================================= NAVIGATION ======================================================== -->
+
+<header class="navbar">
+
+<div class="nav-inner">
+
+<a href="#top" class="brand">
+
+<span class="brand-symbol"></span>
+
+<span> QUANTUM / 01 </span>
+
+</a>
+
+<nav class="nav-links">
+
+<a href="#quantum"> Quantum </a>
+
+<a href="#threat"> Threat </a>
+
+<a href="#pqc"> PQC </a>
+
+<a href="#algorithms"> Algorithms </a>
+
+<a href="#safeswitch"> SafeSwitch </a>
+
+</nav>
+
+<a href="#begin" class="nav-cta"> Explore </a>
+
+</div>
+
+</header>
+
+<!-- ======================================================= HERO ======================================================== -->
+
+<main id="top">
+
+<section class="hero">
+
+<div class="container">
+
+<div class="hero-content">
+
+<div class="hero-badge">
+
+<span class="hero-dot"></span>
+
+The transition to the post-quantum era
+
+</div>
+
+<h1 class="hero-title">
+
+The future of computing will change the rules of <span class="gradient-text"> digital trust. </span>
+
+</h1>
+
+<p class="hero-description">
+
+Quantum computers introduce a fundamentally different computational model. Some of the mathematical assumptions protecting today's Internet could eventually become vulnerable.
+
+<br><br>
+
+Post-quantum cryptography is the engineering effort to prepare for that world before it arrives.
+
+</p>
+
+<div class="hero-actions">
+
+<a href="#quantum" class="button button-primary" > Understand quantum computing </a>
+
+<a href="#pqc" class="button" > Learn about PQC </a>
+
+</div>
+
+</div>
+
+<!-- IMAGE PLACEHOLDER -->
+
+<div class="image-area">
+
+<div class="image-placeholder-content">
+
+<div class="image-icon"> Q </div>
+
+<div class="image-title"> HERO IMAGE PLACEHOLDER </div>
+
+<div class="image-description">
+
+Replace this area with your own hero image.
+
+<br>
+
+Recommended: quantum processor, dilution refrigerator, futuristic quantum computer, or quantum network.
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== BEGIN ====================================================== -->
+
+<section class="section" id="begin">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 01 / The big picture </div>
+
+<h2 class="section-title"> Why quantum computing matters to cybersecurity. </h2>
+
+<p class="section-description">
+
+Modern digital security is built on mathematical assumptions. We use those assumptions because certain mathematical problems are extremely difficult for classical computers to solve.
+
+<br><br>
+
+Quantum computing introduces algorithms that can dramatically change the difficulty of some of those problems.
+
+</p>
+
+</div>
+
+<div class="grid grid-3">
+
+<article class="card">
+
+<div class="card-icon"> 01 </div>
+
+<h3 class="card-title"> Classical computers </h3>
+
+<p>
+
+Traditional computers operate using bits. A bit represents one of two logical states: zero or one.
+
+Modern processors can manipulate billions of bits extremely quickly, but their underlying computational model remains classical.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-icon"> 02 </div>
+
+<h3 class="card-title"> Quantum computers </h3>
+
+<p>
+
+Quantum computers use qubits and exploit phenomena such as superposition, entanglement and interference.
+
+They are designed to solve particular classes of problems using quantum mechanics.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-icon"> 03 </div>
+
+<h3 class="card-title"> Cryptography </h3>
+
+<p>
+
+Cryptography protects communication, authentication, software updates, digital identities, financial transactions and infrastructure.
+
+Its security depends on mathematical assumptions.
+
+</p>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== QUANTUM COMPUTING ====================================================== -->
+
+<section class="section" id="quantum">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 02 / Quantum computing </div>
+
+<h2 class="section-title"> A quantum computer is not simply a faster computer. </h2>
+
+<p class="section-description">
+
+The important difference is the computational model.
+
+Quantum computers manipulate quantum states. Their power comes from carefully controlling quantum amplitudes and interference, not simply from having a faster CPU.
+
+</p>
+
+</div>
+
+<!-- IMAGE PLACEHOLDER -->
+
+<div class="image-area">
+
+<div class="image-placeholder-content">
+
+<div class="image-icon"> Ψ </div>
+
+<div class="image-title"> QUANTUM COMPUTER IMAGE </div>
+
+<div class="image-description">
+
+Insert your own image here.
+
+<br>
+
+Suggested visual: superconducting qubit chip, trapped-ion quantum computer, quantum laboratory, or dilution refrigerator.
+
+</div>
+
+</div>
+
+</div>
+
+<div style="height: 30px;"></div>
+
+<div class="grid grid-2">
+
+<div class="quantum-box">
+
+<h3 class="card-title"> Classical bit </h3>
+
+<p>
+
+A classical bit has one logical value at a time.
+
+</p>
+
+<div class="equation">
+
+bit ∈ { 0, 1 }
+
+</div>
+
+<p>
+
+Classical computing represents information using combinations of these binary states.
+
+</p>
+
+</div>
+
+<div class="quantum-box">
+
+<h3 class="card-title"> Qubit </h3>
+
+<p>
+
+A qubit can be described using a superposition of computational basis states.
+
+</p>
+
+<div class="equation">
+
+|ψ⟩ = α|0⟩ + β|1⟩
+
+</div>
+
+<p>
+
+The complex amplitudes satisfy:
+
+</p>
+
+<div class="equation">
+
+|α|² + |β|² = 1
+
+</div>
+
+</div>
+
+</div>
+
+<div style="height: 18px;"></div>
+
+<div class="grid grid-3">
+
+<article class="card">
+
+<div class="card-label"> CONCEPT 01 </div>
+
+<h3 class="card-title"> Superposition </h3>
+
+<p>
+
+Quantum states can exist as combinations of basis states. The amplitudes associated with those states can later interfere with one another.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> CONCEPT 02 </div>
+
+<h3 class="card-title"> Entanglement </h3>
+
+<p>
+
+Multiple quantum systems can become correlated in ways that cannot be described as independent classical states.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> CONCEPT 03 </div>
+
+<h3 class="card-title"> Interference </h3>
+
+<p>
+
+Quantum amplitudes can reinforce or cancel one another. Quantum algorithms exploit this behavior to increase useful outcomes and suppress others.
+
+</p>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== QUANTUM STATE SPACE ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 03 / Scaling </div>
+
+<h2 class="section-title"> The state space grows exponentially. </h2>
+
+<p class="section-description">
+
+With n qubits, the mathematical state is described over 2ⁿ computational basis states.
+
+That does not mean we can simply read 2ⁿ classical answers from a measurement. Quantum algorithms must engineer interference so that useful information can actually be extracted.
+
+</p>
+
+</div>
+
+<div class="table-wrapper">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th> Qubits </th>
+
+<th> Basis states </th>
+
+<th> Mathematical state space </th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr> <td>1</td> <td>2</td> <td>2¹</td> </tr>
+
+<tr> <td>2</td> <td>4</td> <td>2²</td> </tr>
+
+<tr> <td>3</td> <td>8</td> <td>2³</td> </tr>
+
+<tr> <td>10</td> <td>1,024</td> <td>2¹⁰</td> </tr>
+
+<tr> <td>50</td> <td>1,125,899,906,842,624</td> <td>2⁵⁰</td> </tr>
+
+<tr> <td>100</td> <td>≈ 1.27 × 10³⁰</td> <td>2¹⁰⁰</td> </tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<div style="height: 30px;"></div>
+
+<div class="callout">
+
+<strong> A critical clarification </strong>
+
+<p>
+
+Saying that a quantum computer has 2ⁿ possible basis states does not mean it can calculate 2ⁿ independent classical answers and return them all.
+
+Quantum algorithms are powerful because they manipulate amplitudes and interference in ways that can provide speedups for specific problems.
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== THREAT ====================================================== -->
+
+<section class="section" id="threat">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 04 / The cryptographic threat </div>
+
+<h2 class="section-title"> Quantum computing does not break everything. It changes specific mathematical assumptions. </h2>
+
+<p class="section-description">
+
+The most important cryptographic quantum threat comes from algorithms such as Shor's algorithm.
+
+A different class of impact comes from Grover's algorithm.
+
+</p>
+
+</div>
+
+<div class="grid grid-2">
+
+<article class="card">
+
+<div class="card-label"> QUANTUM ALGORITHM </div>
+
+<h3 class="card-title"> Shor's algorithm </h3>
+
+<p>
+
+Shor's algorithm provides an efficient quantum approach to integer factorization and discrete logarithms.
+
+Those mathematical problems are closely connected to the security foundations of widely used public-key systems.
+
+</p>
+
+<p>
+
+This is why RSA and elliptic-curve cryptography are central concerns in the transition to post-quantum cryptography.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> QUANTUM ALGORITHM </div>
+
+<h3 class="card-title"> Grover's algorithm </h3>
+
+<p>
+
+Grover's algorithm provides a quadratic speedup for unstructured search.
+
+Its impact on symmetric cryptography is therefore fundamentally different from Shor's impact on public-key cryptography.
+
+</p>
+
+<p>
+
+The practical response includes selecting appropriate symmetric key sizes and security margins.
+
+</p>
+
+</article>
+
+</div>
+
+<div style="height: 30px;"></div>
+
+<div class="table-wrapper">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th> Technology </th>
+
+<th> Classical security assumption </th>
+
+<th> Quantum concern </th>
+
+<th> General response </th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td> RSA </td>
+
+<td> Integer factorization </td>
+
+<td> Shor's algorithm </td>
+
+<td> Migrate to PQC </td>
+
+</tr>
+
+<tr>
+
+<td> ECC </td>
+
+<td> Discrete logarithm problems </td>
+
+<td> Quantum discrete-log algorithms </td>
+
+<td> Migrate to PQC </td>
+
+</tr>
+
+<tr>
+
+<td> AES </td>
+
+<td> Brute-force search resistance </td>
+
+<td> Grover-type speedup </td>
+
+<td> Appropriate key sizes </td>
+
+</tr>
+
+<tr>
+
+<td> Hash functions </td>
+
+<td> Preimage / collision resistance </td>
+
+<td> Quantum search effects </td>
+
+<td> Appropriate output sizes </td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== SHOR ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 05 / Shor's algorithm </div>
+
+<h2 class="section-title"> Why public-key cryptography is the main concern. </h2>
+
+<p class="section-description">
+
+Public-key cryptography allows strangers to communicate securely and authenticate one another without first sharing a secret key.
+
+The security of many classical systems depends on mathematical problems believed to be difficult.
+
+</p>
+
+</div>
+
+<!-- IMAGE PLACEHOLDER -->
+
+<div class="image-area">
+
+<div class="image-placeholder-content">
+
+<div class="image-icon"> S </div>
+
+<div class="image-title"> SHOR'S ALGORITHM DIAGRAM </div>
+
+<div class="image-description">
+
+Place your own educational diagram here.
+
+<br>
+
+Good visual: factorization → period finding → quantum Fourier transform → recovered mathematical structure.
+
+</div>
+
+</div>
+
+</div>
+
+<div style="height: 30px;"></div>
+
+<div class="grid grid-2">
+
+<article class="card">
+
+<div class="card-label"> RSA </div>
+
+<h3 class="card-title"> Factoring </h3>
+
+<p>
+
+RSA uses arithmetic involving large integers. The security of properly configured RSA depends on the practical difficulty of factoring large numbers using known classical methods.
+
+</p>
+
+<p>
+
+A sufficiently powerful fault-tolerant quantum computer running Shor's algorithm would change that assumption.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> ECC </div>
+
+<h3 class="card-title"> Discrete logarithms </h3>
+
+<p>
+
+Elliptic-curve cryptography uses the mathematical structure of elliptic curves.
+
+Protocols and signatures based on elliptic-curve discrete logarithms are also threatened by quantum algorithms.
+
+</p>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== HARVEST NOW ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 06 / Harvest now, decrypt later </div>
+
+<h2 class="section-title"> The quantum problem starts before quantum computers arrive. </h2>
+
+<p class="section-description">
+
+Encrypted information can have a lifetime much longer than the systems that originally transmitted it.
+
+An attacker can capture encrypted traffic today and retain it for future cryptanalysis.
+
+</p>
+
+</div>
+
+<div class="flow">
+
+<article class="flow-card">
+
+<div class="flow-number"> 01 </div>
+
+<h3 class="flow-title"> Capture </h3>
+
+<p> Encrypted communication is collected. </p>
+
+</article>
+
+<article class="flow-card">
+
+<div class="flow-number"> 02 </div>
+
+<h3 class="flow-title"> Store </h3>
+
+<p> Ciphertext is retained for years. </p>
+
+</article>
+
+<article class="flow-card">
+
+<div class="flow-number"> 03 </div>
+
+<h3 class="flow-title"> Technology advances </h3>
+
+<p> Future computational capabilities improve. </p>
+
+</article>
+
+<article class="flow-card">
+
+<div class="flow-number"> 04 </div>
+
+<h3 class="flow-title"> Cryptanalysis </h3>
+
+<p> Previously protected material becomes a target. </p>
+
+</article>
+
+<article class="flow-card">
+
+<div class="flow-number"> 05 </div>
+
+<h3 class="flow-title"> Exposure </h3>
+
+<p> Long-lived confidential information may be revealed. </p>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== PQC ====================================================== -->
+
+<section class="section" id="pqc">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 07 / Post-quantum cryptography </div>
+
+<h2 class="section-title"> PQC is the cryptographic answer to the quantum threat. </h2>
+
+<p class="section-description">
+
+Post-quantum cryptography describes cryptographic algorithms designed to remain secure against known classical and quantum attack techniques.
+
+They run on conventional computers.
+
+</p>
+
+</div>
+
+<!-- IMAGE PLACEHOLDER -->
+
+<div class="image-area">
+
+<div class="image-placeholder-content">
+
+<div class="image-icon"> PQ </div>
+
+<div class="image-title"> PQC VISUAL PLACEHOLDER </div>
+
+<div class="image-description">
+
+Suggested visual:
+
+<br>
+
+classical cryptography → quantum threat → PQC migration → quantum-resistant infrastructure.
+
+</div>
+
+</div>
+
+</div>
+
+<div style="height: 30px;"></div>
+
+<div class="grid grid-3">
+
+<article class="card">
+
+<div class="card-label"> FAMILY </div>
+
+<h3 class="card-title"> Lattice-based </h3>
+
+<p>
+
+Lattice cryptography uses hard mathematical problems involving high-dimensional lattices.
+
+Modern standardized PQC algorithms such as ML-KEM and ML-DSA are based on structured lattice problems.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> FAMILY </div>
+
+<h3 class="card-title"> Hash-based </h3>
+
+<p>
+
+Hash-based signatures build digital signatures from cryptographic hash functions.
+
+They provide an important alternative construction with different operational properties.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> FAMILY </div>
+
+<h3 class="card-title"> Code-based </h3>
+
+<p>
+
+Code-based cryptography derives security from difficult decoding problems associated with error-correcting codes.
+
+</p>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== ML-KEM ====================================================== -->
+
+<section class="section" id="algorithms">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 08 / Key establishment </div>
+
+<h2 class="section-title"> ML-KEM: building a shared secret in a post-quantum world. </h2>
+
+<p class="section-description">
+
+ML-KEM is a standardized post-quantum key encapsulation mechanism.
+
+It is designed to allow communicating parties to establish shared secret material without relying on classical public-key assumptions vulnerable to quantum attacks.
+
+</p>
+
+</div>
+
+<div class="grid grid-2">
+
+<article class="quantum-box">
+
+<h3 class="card-title"> What ML-KEM does </h3>
+
+<p>
+
+ML-KEM is used for key establishment rather than directly encrypting large application data streams.
+
+</p>
+
+<div class="equation">
+
+Key establishment → shared secret → symmetric encryption
+
+</div>
+
+<p>
+
+Once both parties possess shared secret material, efficient symmetric cryptography can protect the actual application traffic.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> CORE IDEA </div>
+
+<h3 class="card-title"> Keep bulk encryption symmetric. </h3>
+
+<p>
+
+Public-key and KEM operations are comparatively expensive.
+
+Symmetric authenticated encryption is designed for efficiently protecting large volumes of traffic.
+
+</p>
+
+<p>
+
+This division of responsibility is fundamental to practical secure networking.
+
+</p>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== ML-DSA ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 09 / Digital signatures </div>
+
+<h2 class="section-title"> ML-DSA: protecting identity and integrity. </h2>
+
+<p class="section-description">
+
+Confidentiality is only one part of security.
+
+Infrastructure must also know who is allowed to issue commands, publish configuration, deploy software and identify itself as a trusted node.
+
+</p>
+
+</div>
+
+<div class="grid grid-3">
+
+<article class="card">
+
+<h3 class="card-title"> Node identity </h3>
+
+<p>
+
+Infrastructure nodes need cryptographic identities so that other components can distinguish legitimate systems from unauthorized systems.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<h3 class="card-title"> Configuration </h3>
+
+<p>
+
+Critical routing and failover policies can be authenticated and digitally signed.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<h3 class="card-title"> Software updates </h3>
+
+<p>
+
+Digital signatures can help verify that software packages and updates came from an authorized source and were not modified.
+
+</p>
+
+</article>
+
+</div>
+
+<div style="height: 30px;"></div>
+
+<div class="callout">
+
+<strong> Encryption and signatures solve different problems. </strong>
+
+<p>
+
+A KEM such as ML-KEM is associated with establishing shared secret material.
+
+A signature algorithm such as ML-DSA is associated with authenticity and integrity.
+
+A complete PQC architecture should consider both.
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== HYBRID ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 10 / Hybrid cryptography </div>
+
+<h2 class="section-title"> The transition does not have to be all-or-nothing. </h2>
+
+<p class="section-description">
+
+During migration, organizations can use classical and post-quantum mechanisms together where protocols and implementations support appropriate hybrid constructions.
+
+</p>
+
+</div>
+
+<div class="flow">
+
+<article class="flow-card">
+
+<div class="flow-number"> 01 </div>
+
+<h3 class="flow-title"> Classical key exchange </h3>
+
+<p> Preserve established security mechanisms during transition. </p>
+
+</article>
+
+<article class="flow-card">
+
+<div class="flow-number"> 02 </div>
+
+<h3 class="flow-title"> PQC exchange </h3>
+
+<p> Add a post-quantum mechanism. </p>
+
+</article>
+
+<article class="flow-card">
+
+<div class="flow-number"> 03 </div>
+
+<h3 class="flow-title"> Combine </h3>
+
+<p> Derive key material using the protocol's defined hybrid construction. </p>
+
+</article>
+
+<article class="flow-card">
+
+<div class="flow-number"> 04 </div>
+
+<h3 class="flow-title"> Session key </h3>
+
+<p> Establish efficient symmetric session encryption. </p>
+
+</article>
+
+<article class="flow-card">
+
+<div class="flow-number"> 05 </div>
+
+<h3 class="flow-title"> Secure traffic </h3>
+
+<p> Protect application data using symmetric authenticated encryption. </p>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== TLS ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 11 / TLS 1.3 </div>
+
+<h2 class="section-title"> You do not need to invent a new Internet protocol. </h2>
+
+<p class="section-description">
+
+The goal of PQC migration is not to throw away decades of protocol engineering.
+
+Mature protocols such as TLS provide an established framework into which new cryptographic mechanisms can be integrated.
+
+</p>
+
+</div>
+
+<div class="grid grid-2">
+
+<article class="card">
+
+<h3 class="card-title"> TLS remains the framework. </h3>
+
+<p>
+
+TLS provides authenticated secure communication.
+
+PQC can change the underlying cryptographic mechanisms used for key establishment and authentication while retaining the overall protocol architecture.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<h3 class="card-title"> PQC changes the cryptographic components. </h3>
+
+<p>
+
+Migration can affect handshake sizes, certificates, computational cost, key establishment and signatures.
+
+These effects need to be measured rather than assumed.
+
+</p>
+
+</article>
+
+</div>
+
+<div style="height: 30px;"></div>
+
+<div class="code-block">
+
+<div class="code-header">
+
+<span class="window-dot red"></span> <span class="window-dot yellow"></span> <span class="window-dot green"></span>
+
+<span style="margin-left: 8px;"> conceptual-secure-session.txt </span>
+
+</div>
+
+<pre><span class="comment"># Conceptual architecture</span>
+
+Client | | Classical + PQC key establishment | v Server | | Shared secret derivation | v <span class="keyword">Session keys</span> | | TLS 1.3 / authenticated encryption | v <span class="function">Protected application traffic</span>
+
+<span class="comment"># PQC protects the cryptographic trust boundary.</span> <span class="comment"># Symmetric encryption protects the bulk data path.</span></pre>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== CRYPTOGRAPHIC AGILITY ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 12 / Cryptographic agility </div>
+
+<h2 class="section-title"> The real goal is not one perfect algorithm. </h2>
+
+<p class="section-description">
+
+The deeper lesson of PQC migration is cryptographic agility: systems should be able to replace cryptographic components without rebuilding the entire infrastructure.
+
+</p>
+
+</div>
+
+<div class="stats">
+
+<div class="stat">
+
+<div class="stat-number"> 01 </div>
+
+<div class="stat-text"> Inventory cryptographic dependencies. </div>
+
+</div>
+
+<div class="stat">
+
+<div class="stat-number"> 02 </div>
+
+<div class="stat-text"> Separate cryptographic interfaces from applications. </div>
+
+</div>
+
+<div class="stat">
+
+<div class="stat-number"> 03 </div>
+
+<div class="stat-text"> Test multiple algorithms and implementations. </div>
+
+</div>
+
+<div class="stat">
+
+<div class="stat-number"> 04 </div>
+
+<div class="stat-text"> Make future replacement operationally possible. </div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== SAFESWITCH ====================================================== -->
+
+<section class="section" id="safeswitch">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 13 / SafeSwitch + PQC </div>
+
+<h2 class="section-title"> Where post-quantum security fits into SafeSwitch. </h2>
+
+<p class="section-description">
+
+PQC should strengthen the trust and control layers of SafeSwitch without slowing down the packet-processing hot path.
+
+The architecture becomes more interesting when the two concerns are deliberately separated.
+
+</p>
+
+</div>
+
+<!-- IMAGE PLACEHOLDER -->
+
+<div class="image-area">
+
+<div class="image-placeholder-content">
+
+<div class="image-icon"> SS </div>
+
+<div class="image-title"> SAFESWITCH + PQC ARCHITECTURE </div>
+
+<div class="image-description">
+
+Replace this placeholder with your architecture diagram.
+
+<br><br>
+
+Recommended structure:
+
+<br>
+
+Internet → Anycast/BGP → NIC → XDP → eBPF → SafeSwitch → regions
+
+<br>
+
+with PQC protecting the control and identity layers.
+
+</div>
+
+</div>
+
+</div>
+
+<div style="height: 35px;"></div>
+
+<div class="architecture">
+
+<div class="architecture-column">
+
+<div class="architecture-node">
+
+<strong> Internet </strong>
+
+<span> External traffic </span>
+
+</div>
+
+<div class="architecture-node">
+
+<strong> Anycast / BGP </strong>
+
+<span> Global routing </span>
+
+</div>
+
+<div class="architecture-node">
+
+<strong> NIC </strong>
+
+<span> Physical network boundary </span>
+
+</div>
+
+</div>
+
+<div class="architecture-center">
+
+<div>
+
+<div class="architecture-center-title"> SafeSwitch </div>
+
+<p> XDP </p>
+
+<p> eBPF </p>
+
+<p> Kernel-level telemetry </p>
+
+<p> Traffic steering </p>
+
+<p> Failover decisions </p>
+
+</div>
+
+</div>
+
+<div class="architecture-column">
+
+<div class="architecture-node">
+
+<strong> PQC Identity </strong>
+
+<span> Node authentication </span>
+
+</div>
+
+<div class="architecture-node">
+
+<strong> PQC Control Plane </strong>
+
+<span> Secure orchestration </span>
+
+</div>
+
+<div class="architecture-node">
+
+<strong> Multi-region policy </strong>
+
+<span> Configuration integrity </span>
+
+</div>
+
+</div>
+
+</div>
+
+<div style="height: 30px;"></div>
+
+<div class="grid grid-2">
+
+<article class="card">
+
+<div class="card-label"> DATA PLANE </div>
+
+<h3 class="card-title"> Keep the hot path extremely fast. </h3>
+
+<p>
+
+XDP and eBPF should remain focused on packet classification, filtering, telemetry and traffic decisions.
+
+</p>
+
+<p>
+
+Heavy public-key operations should generally not be performed for every packet.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> CONTROL PLANE </div>
+
+<h3 class="card-title"> Put PQC where trust decisions happen. </h3>
+
+<p>
+
+PQC is valuable for node authentication, secure control-plane sessions, policy distribution, configuration signatures and software updates.
+
+</p>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== DDoS ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 14 / DDoS </div>
+
+<h2 class="section-title"> PQC and XDP solve different security problems. </h2>
+
+<p class="section-description">
+
+One protects mathematical trust assumptions.
+
+The other allows infrastructure to process and discard packets extremely early.
+
+Combining both can produce a stronger architecture.
+
+</p>
+
+</div>
+
+<div class="grid grid-3">
+
+<article class="card">
+
+<div class="card-label"> PROBLEM </div>
+
+<h3 class="card-title"> Volumetric attacks </h3>
+
+<p>
+
+Attackers attempt to overwhelm bandwidth, network interfaces, connection capacity or application resources.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> DEFENSE </div>
+
+<h3 class="card-title"> XDP </h3>
+
+<p>
+
+XDP can discard unwanted traffic at an extremely early point in Linux networking, reducing the amount of work performed by later layers.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> TRUST </div>
+
+<h3 class="card-title"> PQC </h3>
+
+<p>
+
+PQC protects the cryptographic mechanisms used for identity, key establishment and signatures.
+
+</p>
+
+</article>
+
+</div>
+
+<div style="height: 30px;"></div>
+
+<div class="callout">
+
+<strong> A necessary limitation </strong>
+
+<p>
+
+Local packet filtering cannot recover bandwidth that has already been exhausted upstream.
+
+If an attack saturates the network path before traffic reaches infrastructure controlled by SafeSwitch, upstream routing, capacity, filtering or DDoS-scrubbing mechanisms are required.
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== ANYCAST ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 15 / Anycast </div>
+
+<h2 class="section-title"> Global distribution changes the failure domain. </h2>
+
+<p class="section-description">
+
+A distributed infrastructure can place multiple independently operated nodes in different geographic locations.
+
+Anycast can then help direct users toward available network locations.
+
+</p>
+
+</div>
+
+<!-- IMAGE PLACEHOLDER -->
+
+<div class="image-area">
+
+<div class="image-placeholder-content">
+
+<div class="image-icon"> A </div>
+
+<div class="image-title"> GLOBAL ANYCAST MAP </div>
+
+<div class="image-description">
+
+Add a world map here showing:
+
+<br>
+
+North America · Europe · Asia · Middle East · Africa · Oceania
+
+<br><br>
+
+Mark your SafeSwitch nodes and regional failover paths.
+
+</div>
+
+</div>
+
+</div>
+
+<div style="height: 30px;"></div>
+
+<div class="grid grid-3">
+
+<article class="card">
+
+<h3 class="card-title"> Geographic diversity </h3>
+
+<p>
+
+Multiple locations reduce dependence on one physical or cloud-region failure domain.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<h3 class="card-title"> Local intelligence </h3>
+
+<p>
+
+Each node can observe conditions close to the actual traffic rather than relying exclusively on distant control-plane information.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<h3 class="card-title"> Regional resilience </h3>
+
+<p>
+
+Traffic can be redirected according to health, capacity and routing policy.
+
+</p>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== MIGRATION ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 16 / Migration </div>
+
+<h2 class="section-title"> Becoming post-quantum is a systems-engineering project. </h2>
+
+<p class="section-description">
+
+The hardest part is often not selecting an algorithm.
+
+It is discovering where cryptography exists throughout a large organization.
+
+</p>
+
+</div>
+
+<div class="timeline">
+
+<div class="timeline-item">
+
+<div class="timeline-dot"></div>
+
+<div class="timeline-label"> PHASE 01 </div>
+
+<h3 class="timeline-title"> Inventory </h3>
+
+<p class="timeline-text">
+
+Identify certificates, keys, protocols, libraries, applications, VPNs, APIs, embedded devices, identity systems and long-lived encrypted data.
+
+</p>
+
+</div>
+
+<div class="timeline-item">
+
+<div class="timeline-dot"></div>
+
+<div class="timeline-label"> PHASE 02 </div>
+
+<h3 class="timeline-title"> Classify </h3>
+
+<p class="timeline-text">
+
+Determine which systems depend on RSA, ECC or other quantum-vulnerable mechanisms.
+
+</p>
+
+</div>
+
+<div class="timeline-item">
+
+<div class="timeline-dot"></div>
+
+<div class="timeline-label"> PHASE 03 </div>
+
+<h3 class="timeline-title"> Test </h3>
+
+<p class="timeline-text">
+
+Measure CPU cost, memory requirements, handshake sizes, bandwidth overhead and interoperability.
+
+</p>
+
+</div>
+
+<div class="timeline-item">
+
+<div class="timeline-dot"></div>
+
+<div class="timeline-label"> PHASE 04 </div>
+
+<h3 class="timeline-title"> Hybrid deployment </h3>
+
+<p class="timeline-text">
+
+Where appropriate, introduce post-quantum mechanisms alongside established classical mechanisms.
+
+</p>
+
+</div>
+
+<div class="timeline-item">
+
+<div class="timeline-dot"></div>
+
+<div class="timeline-label"> PHASE 05 </div>
+
+<h3 class="timeline-title"> Migration </h3>
+
+<p class="timeline-text">
+
+Gradually remove vulnerable dependencies while preserving operational continuity.
+
+</p>
+
+</div>
+
+<div class="timeline-item">
+
+<div class="timeline-dot"></div>
+
+<div class="timeline-label"> PHASE 06 </div>
+
+<h3 class="timeline-title"> Continuous monitoring </h3>
+
+<p class="timeline-text">
+
+Cryptographic recommendations evolve. Security architecture therefore needs to remain adaptable.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== ENGINEERING COST ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 17 / Engineering reality </div>
+
+<h2 class="section-title"> Post-quantum security has real engineering costs. </h2>
+
+<p class="section-description">
+
+PQC should not be treated as a magic checkbox.
+
+New algorithms can change bandwidth requirements, handshake sizes, CPU usage, memory requirements and implementation complexity.
+
+</p>
+
+</div>
+
+<div class="table-wrapper">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th> Property </th>
+
+<th> Classical systems </th>
+
+<th> PQC systems </th>
+
+<th> Engineering question </th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td> Key material </td>
+
+<td> Often compact </td>
+
+<td> Can be larger </td>
+
+<td> Does the protocol have enough capacity? </td>
+
+</tr>
+
+<tr>
+
+<td> Signatures </td>
+
+<td> Often compact </td>
+
+<td> Can be larger </td>
+
+<td> What is the bandwidth impact? </td>
+
+</tr>
+
+<tr>
+
+<td> CPU </td>
+
+<td> Mature performance characteristics </td>
+
+<td> Algorithm dependent </td>
+
+<td> What happens under peak load? </td>
+
+</tr>
+
+<tr>
+
+<td> Memory </td>
+
+<td> Usually well understood </td>
+
+<td> Can increase </td>
+
+<td> Does it fit constrained infrastructure? </td>
+
+</tr>
+
+<tr>
+
+<td> Compatibility </td>
+
+<td> Extremely mature </td>
+
+<td> Transitioning </td>
+
+<td> Can old systems communicate? </td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== WHAT PQC DOES NOT SOLVE ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 18 / What PQC does not solve </div>
+
+<h2 class="section-title"> Quantum resistance is not the same thing as total security. </h2>
+
+</div>
+
+<div class="grid grid-2">
+
+<article class="card">
+
+<h3 class="card-title"> It does not stop DDoS attacks. </h3>
+
+<p>
+
+PQC protects cryptographic assumptions. It does not increase network capacity or automatically absorb volumetric attacks.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<h3 class="card-title"> It does not fix compromised endpoints. </h3>
+
+<p>
+
+If an authorized endpoint is compromised, encryption alone cannot make that endpoint trustworthy again.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<h3 class="card-title"> It does not automatically secure BGP. </h3>
+
+<p>
+
+Routing security is a separate engineering domain. BGP security mechanisms and operational controls remain important.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<h3 class="card-title"> It does not eliminate every attack. </h3>
+
+<p>
+
+Authentication, authorization, isolation, secure software development, monitoring, key management and incident response remain necessary.
+
+</p>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== COMPLETE ARCHITECTURE ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 19 / The complete model </div>
+
+<h2 class="section-title"> Resilient infrastructure for a post-quantum Internet. </h2>
+
+<p class="section-description">
+
+The most powerful architecture is layered.
+
+Network routing handles global reachability. XDP handles early packet processing. eBPF provides kernel-level intelligence. Failover provides resilience. PQC protects long-term cryptographic trust.
+
+</p>
+
+</div>
+
+<!-- IMAGE PLACEHOLDER -->
+
+<div class="image-area">
+
+<div class="image-placeholder-content">
+
+<div class="image-icon"> ∞ </div>
+
+<div class="image-title"> COMPLETE SYSTEM ARCHITECTURE </div>
+
+<div class="image-description">
+
+This is the ideal place for your final technical architecture illustration.
+
+<br><br>
+
+Show:
+
+<br>
+
+Users → Internet → Anycast/BGP → NIC → XDP → eBPF → SafeSwitch → regions
+
+<br><br>
+
+Then show PQC around identity, TLS, control plane, configuration and software signing.
+
+</div>
+
+</div>
+
+</div>
+
+<div style="height: 30px;"></div>
+
+<div class="grid grid-3">
+
+<article class="card">
+
+<div class="card-label"> LAYER 01 </div>
+
+<h3 class="card-title"> Global routing </h3>
+
+<p>
+
+BGP and anycast determine how traffic reaches infrastructure.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> LAYER 02 </div>
+
+<h3 class="card-title"> NIC + XDP </h3>
+
+<p>
+
+Packets can be processed extremely early in the Linux networking path.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> LAYER 03 </div>
+
+<h3 class="card-title"> eBPF </h3>
+
+<p>
+
+Kernel-level observability and programmable networking logic.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> LAYER 04 </div>
+
+<h3 class="card-title"> Failover </h3>
+
+<p>
+
+Local observations can inform regional traffic decisions.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> LAYER 05 </div>
+
+<h3 class="card-title"> TLS + PQC </h3>
+
+<p>
+
+Secure communications using evolving cryptographic mechanisms.
+
+</p>
+
+</article>
+
+<article class="card">
+
+<div class="card-label"> LAYER 06 </div>
+
+<h3 class="card-title"> Cryptographic trust </h3>
+
+<p>
+
+Protect identity, configuration, software updates and control-plane authorization.
+
+</p>
+
+</article>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== FAQ ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="section-header">
+
+<div class="section-label"> 20 / Frequently asked questions </div>
+
+<h2 class="section-title"> The questions that matter. </h2>
+
+</div>
+
+<div class="faq">
+
+<details class="faq-item">
+
+<summary> Is a quantum computer going to break the Internet tomorrow? </summary>
+
+<div class="faq-answer">
+
+No.
+
+Cryptographically relevant quantum computing requires substantial advances in quantum hardware, error correction and fault-tolerant computation.
+
+The reason migration is being discussed now is that cryptographic infrastructure can take years to replace, while sensitive information may need protection for much longer.
+
+</div>
+
+</details>
+
+<details class="faq-item">
+
+<summary> Does post-quantum cryptography require a quantum computer? </summary>
+
+<div class="faq-answer">
+
+No.
+
+PQC algorithms are intended to run on conventional computing infrastructure.
+
+</div>
+
+</details>
+
+<details class="faq-item">
+
+<summary> Does PQC replace TLS? </summary>
+
+<div class="faq-answer">
+
+Not necessarily.
+
+PQC provides cryptographic mechanisms. Protocols such as TLS can incorporate suitable post-quantum mechanisms into their key-establishment and authentication systems.
+
+</div>
+
+</details>
+
+<details class="faq-item">
+
+<summary> Is AES broken by quantum computing? </summary>
+
+<div class="faq-answer">
+
+AES is not threatened in the same way RSA and ECC are.
+
+Grover's algorithm gives a quadratic speedup for certain search problems, so selecting appropriate symmetric key sizes remains important.
+
+</div>
+
+</details>
+
+<details class="faq-item">
+
+<summary> Why not simply wait for quantum computers? </summary>
+
+<div class="faq-answer">
+
+Large organizations have enormous cryptographic dependencies.
+
+Certificates, embedded systems, legacy software, network equipment and long-lived sensitive information cannot necessarily be migrated overnight.
+
+</div>
+
+</details>
+
+<details class="faq-item">
+
+<summary> Should PQC operations run inside eBPF? </summary>
+
+<div class="faq-answer">
+
+Heavy public-key cryptographic operations generally should not be inserted into the per-packet hot path.
+
+For an architecture such as SafeSwitch, PQC is more naturally applied to the control plane, node identity, configuration signing, software updates and secure management communication.
+
+</div>
+
+</details>
+
+<details class="faq-item">
+
+<summary> Does PQC make SafeSwitch impossible to attack? </summary>
+
+<div class="faq-answer">
+
+No.
+
+PQC strengthens cryptographic assumptions against quantum attacks. It does not eliminate software bugs, compromised endpoints, routing attacks, DDoS attacks, configuration errors or operational failures.
+
+</div>
+
+</details>
+
+<details class="faq-item">
+
+<summary> What is the biggest idea behind all of this? </summary>
+
+<div class="faq-answer">
+
+Cryptographic agility.
+
+Infrastructure should be designed so that cryptographic mechanisms can evolve without requiring the entire system to be rebuilt.
+
+</div>
+
+</details>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== FINAL ====================================================== -->
+
+<section class="section">
+
+<div class="container">
+
+<div class="final-box">
+
+<div class="section-label"> THE POST-QUANTUM ERA </div>
+
+<h2 class="final-title">
+
+Build systems that can survive both infrastructure failure and changing mathematics.
+
+</h2>
+
+<p class="final-text">
+
+Quantum computing changes some of the mathematical assumptions that modern cryptography depends on.
+
+Post-quantum cryptography is the beginning of the response.
+
+But the bigger lesson is architectural:
+
+build infrastructure that can evolve.
+
+<br><br>
+
+Keep the data plane fast.
+
+Keep failure detection independent.
+
+Keep trust cryptographically strong.
+
+Keep algorithms replaceable.
+
+Keep the system distributed.
+
+And assume that today's best security architecture will eventually need to evolve again.
+
+</p>
+
+<div class="equation">
+
+<span class="text-cyan"> Fast data plane </span>
+
++
+
+<span class="text-purple"> Global resilience </span>
+
++
+
+<span class="text-green"> Independent monitoring </span>
+
++
+
+<span class="text-yellow"> Post-quantum trust </span>
+
+<br><br>
+
+=
+
+<strong> Infrastructure designed for the next Internet. </strong>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+<!-- ======================================================= FOOTER ======================================================== -->
+
+<footer>
+
+<div class="container">
+
+<div class="footer-grid">
+
+<div>
+
+<div class="footer-brand"> QUANTUM / 01 </div>
+
+<p class="footer-text">
+
+An educational exploration of quantum computing, cryptography, post-quantum security and resilient infrastructure.
+
+</p>
+
+</div>
+
+<div>
+
+<div class="footer-heading"> Quantum </div>
+
+<ul class="footer-list">
+
+<li> Qubits </li>
+
+<li> Superposition </li>
+
+<li> Entanglement </li>
+
+<li> Interference </li>
+
+<li> Shor's algorithm </li>
+
+<li> Grover's algorithm </li>
+
+</ul>
+
+</div>
+
+<div>
+
+<div class="footer-heading"> Security </div>
+
+<ul class="footer-list">
+
+<li> Post-quantum cryptography </li>
+
+<li> ML-KEM </li>
+
+<li> ML-DSA </li>
+
+<li> TLS 1.3 </li>
+
+<li> Cryptographic agility </li>
+
+<li> SafeSwitch </li>
+
+</ul>
+
+</div>
+
+</div>
+
+<div class="footer-bottom">
+
+Educational content only. Cryptographic implementations should be evaluated against current standards, implementation guidance and the specific threat model of the system.
+
+</div>
+
+</div>
+
+</footer>
+
+</body> </html>
