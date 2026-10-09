@@ -1964,7 +1964,7 @@
   <div class="container hero-content">
 
     <div class="eyebrow">
-      <span class="eyebrow-dot"></span>
+      <span class=""></span>
       KERNEL-NATIVE INFRASTRUCTURE
     </div>
 
@@ -2607,155 +2607,31 @@
 
 
           <h2 class="section-title">
-            The network should not wait for DNS.
+            The New Era:  Hybrid Quantum-Classical
           </h2>
 
           <p class="section-description">
-            Traditional failover depends on external systems that can
-            become the bottleneck precisely when your infrastructure is
-            already under stress.
+The most practical model for the quantum layer is the <strong>Intermediate Quantum Layer</strong> pattern. The idea is simple: classical AI handles the heavy lifting of data processing and final decision-making, while a quantum circuit is embedded in the middle to do the "hard math" that classical computers struggle with. 
           </p>
-
+          <br>
+          <br>
+          <p class="section-description">Input (Classical): Feature Extraction. Reduces high-dimensional data (like network traffic or user inputs) into a small, clean vector that a quantum computer can handle. SafeSwitch Systems XDP/eBPF engine already extracts packet features at the kernel level.</p>
+          <br>
+          <p class="section-description">Middle (Quantum): Quantum Inference Engine. Runs a Variational Quantum Circuit (VQC) to solve optimization, sampling, or classification problems. We rent access to QPUs from IBM/Amazon Braket and run them as a co-processor.</p>
+          <br>
+          <p class="section-description">Output (Classical): 	Post-Processing. Interprets the quantum measurements and makes the final AI decision. </p>
+          <br>
+          <h2 class="section-title">What does the Quantum layer do for the AI?</h2>
+          <br>
+          <p class="section-description">Optimization: Quantum computers can evaluate many variables simultaneously. This is perfect for AI's hardest problems like portfolio optimization, supply chain routing, or model training</p>
+          <br>
+          <p class="section-description">Sampling: AI relies on sampling from complex probability distributions. Quantum computers are naturally good at this, which helps with probabilistic inference and generative AI</p>
+          <br>
+          <p class="section-description">Feature Mapping: Quantum circuits can create non-linear feature maps that classical neural networks struggle to replicate, which can improve model expressiveness and accuracy</p>
         </div>
 
 
-        <div class="comparison reveal">
 
-          <div class="comparison-head">
-
-            <div class="comparison-left">
-              <div class="comparison-small">
-                Traditional
-              </div>
-
-              <div class="comparison-title">
-                DNS Failover
-              </div>
-            </div>
-
-            <div class="comparison-right">
-              <div class="comparison-small">
-                SafeSwitch
-              </div>
-
-              <div class="comparison-title">
-                eBPF + XDP
-              </div>
-            </div>
-
-          </div>
-
-
-          <div class="comparison-body">
-
-            <div class="comparison-side">
-
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-
-                <div class="timeline-content">
-                  <h4>Region failure</h4>
-                  <p>T + 0s</p>
-                </div>
-              </div>
-
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-
-                <div class="timeline-content">
-                  <h4>API health check</h4>
-                  <p>T + 30s</p>
-                </div>
-              </div>
-
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-
-                <div class="timeline-content">
-                  <h4>Control-plane decision</h4>
-                  <p>T + 60s</p>
-                </div>
-              </div>
-
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-
-                <div class="timeline-content">
-                  <h4>DNS propagation</h4>
-                  <p>T + minutes</p>
-                </div>
-              </div>
-
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-
-                <div class="timeline-content">
-                  <h4>Traffic loss</h4>
-                  <p>Revenue at risk</p>
-                </div>
-              </div>
-
-            </div>
-
-
-            <div class="comparison-side">
-
-              <div class="fast-item">
-                <div class="fast-dot"></div>
-
-                <div class="fast-content">
-                  <h4>Packet arrives</h4>
-                  <p>T + 0μs</p>
-                </div>
-              </div>
-
-              <div class="fast-item">
-                <div class="fast-dot"></div>
-
-                <div class="fast-content">
-                  <h4>XDP evaluates</h4>
-                  <p>KERNEL PATH</p>
-                </div>
-              </div>
-
-              <div class="fast-item">
-                <div class="fast-dot"></div>
-
-                <div class="fast-content">
-                  <h4>Backup route selected</h4>
-                  <p>T + &lt; ms</p>
-                </div>
-              </div>
-
-              <div class="fast-item">
-                <div class="fast-dot"></div>
-
-                <div class="fast-content">
-                  <h4>Traffic continues</h4>
-                  <p>NO DNS ROUND TRIP</p>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
-
-          <div class="comparison-slider" id="comparisonSlider"></div>
-
-          <input
-            id="comparisonRange"
-            class="comparison-range"
-            type="range"
-            min="25"
-            max="75"
-            value="50"
-            aria-label="Compare traditional DNS failover and eBPF"
-          />
-
-
-
-        </div>
 
       </div>
 
@@ -3269,7 +3145,7 @@
             Parent company of SafeSwitch Systems - Kernel-native multi-region failover infrastructure
             for high-performance networks.
           </p>
-          <p>Continuum Networks is lead by Aliyev Islom (Founder/CEO) and came into an existence in 2026</p>
+          <p>Continuum Networks is led by Aliyev Islom (Founder/CEO) and came into an existence in 2026</p>
 
         </div>
 
