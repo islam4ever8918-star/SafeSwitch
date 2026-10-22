@@ -1589,146 +1589,135 @@
        FOOTER
     ========================================================= */
 
-    footer {
-      position: relative;
+ footer {
+  position: relative;
+  margin-top: 80px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  /* The original gradient combined with a solid dark base */
+  background: 
+    radial-gradient(ellipse at 50% 0%, rgba(0,245,255,.035), transparent 50%),
+    #050505;
+  overflow: hidden; /* Crucial to keep the absolute video container clipped */
+}
 
-      margin-top: 80px;
+/* 1. NEW BACKGROUND VIDEO LAYER */
+.footer-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.12; /* Keeps the video subtle and premium */
+  pointer-events: none;
+  z-index: 1;
+}
 
-      border-top: 1px solid rgba(255,255,255,.08);
+/* 2. UPDATED INNER LAYER */
+.footer-inner {
+  position: relative;
+  z-index: 2; /* Keeps all text layers above the background video */
+  max-width: 1200px; /* Aligns with your max layout constraints */
+  margin: 0 auto;
+  padding: 80px 24px 35px; /* Added left/right padding to protect content on shrink */
+  
+  /* Flex grid configuration to separate the center title from your links block */
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
 
-      background:
-        radial-gradient(
-          ellipse at 50% 0%,
-          rgba(0,245,255,.035),
-          transparent 50%
-        );
-    }
+/* 3. NEW CENTERED CONTINUUM HEADING */
+.footer-center-title {
+  text-align: center;
+  width: 100%;
+  margin: 0 auto;
+}
 
-    .footer-inner {
-      padding: 80px 0 35px;
-    }
+.footer-center-title h1 {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0;
+  /* Visual alignment fix to compensate for the trailing letter-spacing */
+  text-indent: 0.28em; 
+}
 
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 2fr repeat(3, 1fr);
-      gap: 50px;
-    }
+/* =========================================================
+   YOUR ORIGINAL GRID & LINKS STYLES (Preserved & Sandboxed)
+========================================================= */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, 1fr);
+  gap: 50px;
+  width: 100%;
+}
 
-    .footer-brand p {
-      max-width: 330px;
+.footer-brand p {
+  max-width: 330px;
+  margin-top: 17px;
+  color: rgba(255,255,255,.25);
+  font-size: 12px;
+  line-height: 1.8;
+}
 
-      margin-top: 17px;
+.footer-heading {
+  color: rgba(255,255,255,.22);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
 
-      color: rgba(255,255,255,.25);
+.footer-links {
+  display: grid;
+  gap: 11px;
+  margin-top: 18px;
+}
 
-      font-size: 12px;
-      line-height: 1.8;
-    }
+.footer-links a {
+  color: rgba(255,255,255,.42);
+  font-size: 12px;
+  transition: color .2s ease;
+}
 
-    .footer-heading {
-      color: rgba(255,255,255,.22);
+.footer-links a:hover {
+  color: white;
+}
 
-      font-family: "JetBrains Mono", monospace;
-      font-size: 9px;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-    }
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px; /* Adjusted down slightly to sit nicely below the grid */
+  padding-top: 22px;
+  border-top: 1px solid rgba(255,255,255,.06);
+  color: rgba(255,255,255,.16);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 8px;
+  letter-spacing: .12em;
+}
 
-    .footer-links {
-      display: grid;
-      gap: 11px;
+/* REVEAL ANIMATIONS */
+.reveal {
+  opacity: 0;
+  transform: translateY(35px);
+  transition: opacity 1s var(--ease), transform 1s var(--ease);
+}
 
-      margin-top: 18px;
-    }
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-    .footer-links a {
-      color: rgba(255,255,255,.42);
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-      font-size: 12px;
 
-      transition: color .2s ease;
-    }
-
-    .footer-links a:hover {
-      color: white;
-    }
-
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-
-      margin-top: 70px;
-      padding-top: 22px;
-
-      border-top: 1px solid rgba(255,255,255,.06);
-
-      color: rgba(255,255,255,.16);
-
-      font-family: "JetBrains Mono", monospace;
-      font-size: 8px;
-      letter-spacing: .12em;
-    }
-
-    /* =========================================================
-       REVEAL ANIMATIONS
-    ========================================================= */
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(35px);
-
-      transition:
-        opacity 1s var(--ease),
-        transform 1s var(--ease);
-    }
-
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(25px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* =========================================================
-       RESPONSIVE
-    ========================================================= */
-
-    @media (max-width: 900px) {
-      .nav-links {
-        display: none;
-      }
-
-      .mobile-menu {
-        display: block;
-      }
-
-      .bento {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .card:nth-child(1),
-      .card:nth-child(4) {
-        grid-column: span 2;
-      }
-
-      .dashboard-body {
-        grid-template-columns: 1fr;
-      }
-
-      .footer-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
 
     @media (max-width: 700px) {
       .container {
@@ -1960,10 +1949,6 @@
   <!-- Foreground content -->
   <div class="container hero-content">
 
-    <div class="eyebrow">
-      <span class=""></span>
-      KERNEL-NATIVE INFRASTRUCTURE
-    </div>
 
     <h1>
       Multi-Region
@@ -1978,15 +1963,7 @@
       even realizes there is a crisis.
     </p>
 
-    <div class="hero-buttons">
-      <a href="#terminal" class="btn btn-primary">
-        Deploy to Kernel →
-      </a>
 
-      <a href="#architecture" class="btn btn-secondary">
-        Read Whitepaper
-      </a>
-    </div>
 
   </div>
 
@@ -2668,29 +2645,7 @@ The most practical model for the quantum layer is the <strong>Intermediate Quant
         </div>
 
 
-        <div class="kernel-flow reveal">
 
-          <div class="flow-box">
-            NIC
-          </div>
-
-          <div class="flow-box">
-            XDP
-          </div>
-
-          <div class="flow-box">
-            eBPF
-          </div>
-
-          <div class="flow-box">
-            ROUTE
-          </div>
-
-          <div class="flow-box">
-            BACKUP
-          </div>
-
-        </div>
 
       </div>
 
@@ -3122,6 +3077,99 @@ The most practical model for the quantum layer is the <strong>Intermediate Quant
   ======================================================== -->
 
   <footer>
+    
+
+    <!-- CONTINUUM FOOTER WITH INTEGRATED BACKGROUND VIDEO -->
+<footer style="
+    position: relative;
+    width: 100%;
+    min-height: 250px;
+    background-color: #050505; /* Matches the dark image background */
+    overflow: hidden;
+    padding: 40px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    box-sizing: border-box;
+">
+    
+    <!-- 1. BACKGROUND VIDEO LAYER -->
+    <video autoplay loop muted playsinline style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.15; /* Subtle terminal glow effect (adjust as needed) */
+        pointer-events: none;
+        z-index: 1;
+    ">
+        <!-- Swap out the source URL with your actual MP4 video path -->
+        <source src="./assets/istockphoto-1456232866-640_adpp_is.mp4" type="video/mp4">
+        <source src="https://mixkit.co" type="video/mp4">
+        
+    </video>
+    <!-- WRAPPER FOOTER CONTAINER -->
+<div style="
+    position: relative;
+    width: 100%;
+    height: 250px; /* Adjust height to fit your background image/video aspect ratio */
+    background-image: url('your-grid-background.png'); /* Paths to your uploaded image */
+    background-size: cover;
+    background-position: center;
+    background-color: #050505;
+    overflow: hidden;
+">
+
+    <!-- PERFECTLY CENTERED TEXT CONTAINER -->
+    <div style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        width: 100%;
+        max-width: 90%;
+        z-index: 10;
+        pointer-events: none; /* Prevents text selection blocking background actions */
+    ">
+        
+        <!-- OPTION A: Clean HTML Typography (Modern Look) -->
+        <h1 style="
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 12px;
+            color: #f5f8f8;
+            text-shadow: 0 0 20px rgba(15, 33, 34, 0.4); /* Subtle cyberpunk cyan glow */
+            margin: 0;
+            text-transform: uppercase;
+        ">
+            Continuum
+        </h1>
+        
+    </div>
+
+</div>
+
+    <!-- 2. EXISTING TEXT CONTENT & COLUMNS LAYER -->
+    <div style="
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 1200px;
+        margin-bottom: 20px;
+        /* Apply your existing CSS layout or flex grid for the text columns here */
+    ">
+        <!-- Your architecture, documentation, and contact columns go inside here -->
+    </div>
+
+    <!-- 3. SOPHISTICATED ASCII TEXT OVERLAY -->
+
+
+</footer>
 
     <div class="container footer-inner">
 
