@@ -1728,6 +1728,9 @@
         top: 10px;
         width: calc(100% - 20px);
       }
+      .name-of-the-company{
+        margin-left: 70px;
+      }
 
       .nav-cta {
         display: none;
@@ -1873,16 +1876,101 @@
       }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        scroll-behavior: auto !important;
-        animation-duration: .001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .001ms !important;
-      }
-    }
+/* =========================================================
+   ACCESSIBILITY & REDUCED MOTION (Optimized)
+========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* Instantly jumps positions instead of scaling/sliding */
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Target the footer video to instantly freeze playback */
+  .footer-video {
+    display: none !important; /* Hides video entirely, revealing the clean gradient */
+  }
+
+  /* Ensures your reveal animations instantly load static elements */
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE DESIGN SYSTEM (Cleaned & Consolidated)
+========================================================= */
+@media (max-width: 900px) {
+  /* Navigation & Layout elements */
+  .nav-links { 
+    display: none; 
+  }
+  /* =========================================================
+     MOBILE NAVIGATION DRAWER OVERLAY (Always Visible)
+  ========================================================= */
+  .mobile-menu {
+    display: block; 
+    position: relative; /* Keeps it in the normal layout flow instead of flying off-screen */
+    width: 20%;
+    background-color: #050505;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 1000;
+  }
+
+  
+  /* Bento Grid updates */
+  .bento { 
+    grid-template-columns: repeat(2, 1fr); 
+  }
+  .card:nth-child(1), 
+  .card:nth-child(4) { 
+    grid-column: span 2; 
+  }
+  
+  /* Dashboard modifications */
+  .dashboard-body { 
+    grid-template-columns: 1fr; 
+  }
+
+  /* Footer structural responsiveness */
+  .footer-inner {
+    padding: 60px 20px 30px; /* Snugs content closer together on smaller viewpoint sizes */
+    gap: 40px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr; /* Drops to 1 column for pure mobile vertical stack cleanliness */
+    gap: 35px;
+  }
+
+  /* Adjusts the giant central branding header so it never text-wraps */
+  .footer-center-title h1 {
+    font-size: 1.8rem;
+    letter-spacing: 0.16em;
+    text-indent: 0.16em;
+  }
+
+  /* Cleans up the sub-footer column stacking layout */
+  .footer-bottom {
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    text-align: center;
+    margin-top: 25px;
+  }
+
+  .footer-bottom div:last-child {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+}
+
   </style>
 </head>
 
@@ -1896,7 +1984,7 @@
 
     <a href="#" class="brand">
       <img class="brand-mark" src="./assets/pics/logo.jfif" alt="" aria-hidden="true" />
-      <span>SafeSwitch Systems</span>
+      <span class="name-of-the-company">SafeSwitch Systems</span>
     </a>
 
     <div class="nav-links">
@@ -1910,9 +1998,8 @@
       Deploy →
     </a>
 
-    <button class="mobile-menu" aria-label="Menu">
-      ☰
-    </button>
+
+    
 
   </nav>
 
@@ -3326,6 +3413,33 @@ The most practical model for the quantum layer is the <strong>Intermediate Quant
     /* =========================================================
        SCROLL REVEAL
     ========================================================= */
+/* =========================================================
+   MOBILE NAVIGATION MENU INTERACTION ENGINE
+========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+  // Select the button by its class instead of a broken ID match
+  const toggleBtn = document.querySelector(".mobile-menu");
+  
+  // Target your mobile link drawer panel container (typically .nav-links or a wrapper panel)
+  const navDrawer = document.querySelector(".nav-links") || document.querySelector("nav");
+
+  if (toggleBtn && navDrawer) {
+    toggleBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleBtn.classList.toggle("active");
+      navDrawer.classList.toggle("open");
+    });
+
+    // Automatically snaps the layout closed if a user clicks outside the navigation panel
+    document.addEventListener("click", (e) => {
+      if (!navDrawer.contains(e.target) && !toggleBtn.contains(e.target)) {
+        toggleBtn.classList.remove("active");
+        navDrawer.classList.remove("open");
+      }
+    });
+  }
+});
+
 
     const revealObserver = new IntersectionObserver(
       (entries) => {
